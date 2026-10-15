@@ -27,3 +27,5 @@ So actually we have got the idea that we have data. Okay, now we need to define 
 So in the system of approximate solution,data and model our main goal is to define the best possible model to predict as right as possible. And here we are going to observe the idea of likelihood.
 
 ``L(w | X, y) = P(y, X|w) = argmax w``
+
+So what it is trying to say to us is that we need the best weights to predict the most approximate answer for our question.
