@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth dark overflow-x-hidden">
+<html lang="en" class="scroll-smooth dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -35,27 +35,19 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        /* Полное устранение горизонтального скролла */
+        /* Полное устранение скроллбаров при сохранении плавной прокрутки */
         html, body {
             overflow-x: hidden;
             width: 100%;
             position: relative;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
+            display: none;
         }
 
-        /* Основной вертикальный скроллбар страницы */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 0px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background-color: rgba(150,150,150,0.3);
-            border-radius: 20px;
-        }
-
-        /* Полное скрытие скроллбара у выпадающего меню с сохранением прокрутки */
+        /* Скрытие скроллбара у выпадающего меню */
         #menuList::-webkit-scrollbar {
             display: none;
         }
@@ -64,7 +56,7 @@
             scrollbar-width: none;
         }
 
-        /* Скрытие скроллбара в формуле */
+        /* Скрытие скроллбара в формулах и коде */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -74,10 +66,10 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-dark text-gray-900 dark:text-gray-100 font-serif text-lg leading-relaxed antialiased transition-colors duration-300 selection:bg-gray-300 dark:selection:bg-gray-700 selection:text-black dark:selection:text-white overflow-x-hidden">
+<body class="bg-gray-50 dark:bg-dark text-gray-900 dark:text-gray-100 font-serif text-lg leading-relaxed antialiased transition-colors duration-300 selection:bg-gray-300 dark:selection:bg-gray-700 selection:text-black dark:selection:text-white">
 
     <!-- Main Article Container -->
-    <main class="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-24 min-h-[150vh] w-full overflow-x-hidden">
+    <main class="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-24 min-h-[200vh] w-full">
         
         <!-- Header -->
         <header class="mb-12 sm:mb-16">
@@ -88,19 +80,19 @@
         </header>
 
         <!-- Article Content / Sections -->
-        <div class="space-y-12 sm:space-y-16 w-full">
+        <div class="space-y-16 sm:space-y-24 w-full">
             
             <!-- Agenda -->
             <section id="sec-agenda" class="scroll-mt-28">
                 <h2 class="font-sans text-2xl font-bold mb-4 text-gray-900 dark:text-white">Agenda of this Big Introduction Topic</h2>
                 <ol class="font-sans list-decimal pl-5 space-y-2 text-gray-700 dark:text-gray-300">
-                    <li id="item-1">Data and Likelihood</li>
-                    <li id="item-2">Log Negative Likelihood</li>
-                    <li id="item-3">Optimizer</li>
-                    <li id="item-4">Model Families: Linear models and some Classification models</li>
-                    <li id="item-5">Loss functions and difference between each of them</li>
-                    <li id="item-6">Linear Regression Explained fully</li>
-                    <li id="item-7">Logistic Regression Explained fully</li>
+                    <li>Data and Likelihood</li>
+                    <li>Log Negative Likelihood</li>
+                    <li>Optimizer</li>
+                    <li>Model Families: Linear models and some Classification models</li>
+                    <li>Loss functions and difference between each of them</li>
+                    <li>Linear Regression Explained fully</li>
+                    <li>Logistic Regression Explained fully</li>
                 </ol>
             </section>
 
@@ -117,19 +109,6 @@
                     Imagine that we have some data and we have a target element to predict. Firstly, we are going to talk only about tabular datasets. So let's say that we can predict either numbers or classes.
                 </p>
 
-                <p class="mb-6">
-                    The example with the number can be the temperature prediction made on wind speed and humidity and etc. An example with the class can be within spam/not spam problem in your email or Telegram.
-                </p>
-
-                <p class="mb-6">
-                    So actually we have got the idea that we have data. Okay, now we need to define a model with which we are going to predict our approximate answer. Why is it approximate? The right answer would be because we are humans, so we cannot make a system which is going to make the absolute rightest predictions. But there are also some actually grounded explanations for it, which we are going to talk about later.
-                </p>
-
-                <p class="mb-6">
-                    So in the system of approximate solution, data, and model, our main goal is to define the best possible model to predict as right as possible. And here we are going to observe the idea of likelihood.
-                </p>
-
-                <!-- Clean LaTeX Formula (Responsive & Anti-Overflow) -->
                 <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
                     <div class="text-center text-sm sm:text-base max-w-full">
                         $$\mathcal{L}(w \mid X, y) = P(y, X \mid w) = \arg\max_{w} P(y \mid X, w)$$
@@ -141,6 +120,79 @@
                 </p>
             </section>
 
+            <!-- Section 2 -->
+            <section id="sec-log-likelihood" class="scroll-mt-28 w-full">
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 02</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Log Negative Likelihood</h2>
+                <p class="mb-6">
+                    Working with products of probabilities can lead to numerical underflow. To prevent this, we apply the logarithm, turning multiplication into summation and making optimization stable.
+                </p>
+                
+                <!-- Terminal Code Block Example -->
+                <div class="my-6 rounded-xl bg-gray-900 text-gray-200 font-mono text-sm overflow-hidden shadow-xl border border-gray-800">
+                    <div class="flex items-center justify-between px-4 py-2.5 bg-gray-950 border-b border-gray-800 text-xs text-gray-400">
+                        <span>negative_log_likelihood.py</span>
+                        <div class="flex gap-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-green-500/80"></div>
+                        </div>
+                    </div>
+                    <pre class="p-4 overflow-x-auto no-scrollbar text-emerald-400"><code>import numpy as np
+
+def negative_log_likelihood(y_true, y_pred):
+    eps = 1e-15
+    y_pred = np.clip(y_pred, eps, 1 - eps)
+    nll = -np.sum(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+    return nll</code></pre>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section id="sec-optimizer" class="scroll-mt-28 w-full">
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 03</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Optimizer</h2>
+                <p class="mb-6">
+                    Optimizers like Gradient Descent and Adam help us iteratively update our model weights to minimize the loss function and find the optimal parameters.
+                </p>
+            </section>
+
+            <!-- Section 4 -->
+            <section id="sec-models" class="scroll-mt-28 w-full">
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 04</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Model Families</h2>
+                <p class="mb-6">
+                    Linear models form the cornerstone of machine learning. They are interpretable, fast to train, and serve as the foundation for deep neural networks.
+                </p>
+            </section>
+
+            <!-- Section 5 -->
+            <section id="sec-loss" class="scroll-mt-28 w-full">
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 05</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Loss Functions</h2>
+                <p class="mb-6">
+                    Different tasks require different loss metrics, such as Mean Squared Error (MSE) for regression and Cross-Entropy for classification.
+                </p>
+            </section>
+
+            <!-- Section 6 -->
+            <section id="sec-linear" class="scroll-mt-28 w-full">
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 06</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Linear Regression Explained Fully</h2>
+                <p class="mb-6">
+                    Linear regression models the relationship between a continuous target variable and one or more explanatory features using a linear equation.
+                </p>
+            </section>
+
+            <!-- Section 7 -->
+            <section id="sec-logistic" class="scroll-mt-28 w-full">
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 07</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Logistic Regression Explained Fully</h2>
+                <p class="mb-6">
+                    Logistic regression applies the sigmoid function to map predicted values into probabilities, solving binary classification problems effectively.
+                </p>
+            </section>
+
         </div>
     </main>
 
@@ -149,15 +201,15 @@
         
         <!-- Dropdown Menu -->
         <nav id="menuList" class="absolute bottom-full left-0 mb-3 w-[280px] max-w-[calc(100vw-2rem)] max-h-[50vh] overflow-y-auto bg-white dark:bg-darkCard backdrop-blur-md text-gray-800 dark:text-gray-200 rounded-2xl p-2 transition-all duration-300 ease-out opacity-0 translate-y-2 scale-95 pointer-events-none shadow-2xl border border-gray-200 dark:border-gray-800">
-            <ul class="flex flex-col space-y-1">
-                <li><a href="#sec-agenda" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">Agenda</a></li>
-                <li><a href="#sec-likelihood" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">1. Data and Likelihood</a></li>
-                <li><a href="#item-2" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">2. Log Negative Likelihood</a></li>
-                <li><a href="#item-3" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">3. Optimizer</a></li>
-                <li><a href="#item-4" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">4. Model Families</a></li>
-                <li><a href="#item-5" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">5. Loss functions</a></li>
-                <li><a href="#item-6" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">6. Linear Regression</a></li>
-                <li><a href="#item-7" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">7. Logistic Regression</a></li>
+            <ul class="flex flex-col space-y-1 text-sm font-medium">
+                <li><a href="#sec-agenda" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">Agenda</a></li>
+                <li><a href="#sec-likelihood" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">1. Data and Likelihood</a></li>
+                <li><a href="#sec-log-likelihood" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">2. Log Negative Likelihood</a></li>
+                <li><a href="#sec-optimizer" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">3. Optimizer</a></li>
+                <li><a href="#sec-models" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">4. Model Families</a></li>
+                <li><a href="#sec-loss" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">5. Loss functions</a></li>
+                <li><a href="#sec-linear" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">6. Linear Regression</a></li>
+                <li><a href="#sec-logistic" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">7. Logistic Regression</a></li>
             </ul>
         </nav>
 
@@ -194,7 +246,7 @@
         </div>
     </div>
 
-    <!-- Script for Interactivity -->
+    <!-- Script for Interactivity & IntersectionObserver -->
     <script>
         const controlBar = document.getElementById('controlBar');
         const menuList = document.getElementById('menuList');
@@ -259,6 +311,32 @@
 
         window.addEventListener('scroll', updateProgress);
         window.addEventListener('resize', updateProgress);
+
+        // 4. IntersectionObserver for Active Section Highlighting
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -60% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    links.forEach(link => {
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('bg-gray-100', 'dark:bg-white/10', 'font-semibold', 'text-black', 'dark:text-white');
+                        } else {
+                            link.classList.remove('bg-gray-100', 'dark:bg-white/10', 'font-semibold', 'text-black', 'dark:text-white');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section[id]').forEach((section) => {
+            observer.observe(section);
+        });
     </script>
 </body>
 </html>
