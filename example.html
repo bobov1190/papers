@@ -1,2 +1,308 @@
-# example.html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Design System & Components Reference</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Lora', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        dark: '#121212',
+                        darkCard: '#1a1a1a',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    
+    <!-- MathJax Configuration -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
+    <style>
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Повторяющаяся анимация появления при скролле */
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Плавный аккордеон */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .accordion-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            opacity: 0;
+        }
+        details[open] .accordion-content {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+        .accordion-content > div {
+            overflow: hidden;
+        }
+
+        a, button, tr, details {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    </style>
+</head>
+<body class="bg-[#fcfcfc] dark:bg-[#111111] text-gray-700 dark:text-gray-300 font-serif text-[1.05rem] leading-[1.8] antialiased transition-colors duration-300 selection:bg-gray-200 dark:selection:bg-gray-800">
+
+    <main class="max-w-2xl mx-auto px-5 sm:px-6 py-16 sm:py-28 min-h-[200vh] w-full space-y-24">
+        
+        <!-- HEADER -->
+        <header class="reveal-section">
+            <h1 class="font-sans text-3xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-gray-100 leading-tight">
+                ML Reader: Component Reference
+            </h1>
+            <p class="font-sans text-lg sm:text-xl text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
+                Это эталонный файл-пример, содержащий все разработанные типы контента, микро-анимации и элементы управления для наших технических лонгридов.
+            </p>
+        </header>
+
+        <!-- 1. INTUITION CHECK & COMMON PITFALLS -->
+        <section class="reveal-section">
+            <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">01. Callouts & Notes</span>
+            <h2 class="font-sans text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Заметки и предупреждения</h2>
+            
+            <div class="space-y-6">
+                <!-- Intuition Check -->
+                <div class="pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> Используй этот блок для быстрой ментальной зацепки или аналогии перед погружением в формулы.
+                </div>
+
+                <!-- Common Pitfall -->
+                <div class="pl-4 border-l border-amber-500/60 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Common Pitfall:</span> Используй этот блок с янтарной рамкой, чтобы предупредить читателя о неочевидных инженерных ошибках.
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. MATH & EQUATIONS -->
+        <section class="reveal-section">
+            <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">02. Mathematics</span>
+            <h2 class="font-sans text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Формулы (MathJax)</h2>
+            
+            <p class="mb-4">
+                Строчные переменные и параметры пишутся прямо в тексте с помощью одинарных долларов: матрица предсказаний инлайн проверяется как $X$, веса модели как $w$, а шаг обучения как $\alpha$.
+            </p>
+
+            <div class="my-6 w-full overflow-x-auto no-scrollbar py-2">
+                <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                    $$\mathcal{L}(w \mid X, y) = P(y, X \mid w) = \arg\max_{w} P(y \mid X, w)$$
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. CODE BLOCKS & COLAB -->
+        <section class="reveal-section">
+            <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">03. Code & Implementation</span>
+            <h2 class="font-sans text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Код и Google Colab</h2>
+            
+            <!-- Colab Badge Link -->
+            <div class="mb-2 flex items-center gap-2 font-sans text-xs">
+                <a href="https://colab.research.google.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+                    <svg class="w-3.5 h-3.5 text-amber-500/90 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16.5 3H7.5C5.01 3 3 5.01 3 7.5v9C3 18.99 5.01 21 7.5 21h9c2.49 0 4.5-2.01 4.5-4.5v-9C21 5.01 18.99 3 16.5 3zM12 17.25c-2.9 0-5.25-2.35-5.25-5.25S9.1,6.75,12,6.75s5.25,2.35,5.25,5.25S14.9,17.25,12,17.25z"/>
+                    </svg>
+                    <span>Open implementation in Google Colab</span>
+                </a>
+            </div>
+
+            <!-- Clean Code Block -->
+            <div class="rounded-lg bg-gray-100/70 dark:bg-gray-900/40 text-gray-800 dark:text-gray-200 font-mono text-[0.9rem] overflow-x-auto no-scrollbar border border-gray-200/50 dark:border-gray-800/40 p-5">
+                <pre class="leading-relaxed"><code><span class="text-purple-600 dark:text-purple-400">import</span> numpy <span class="text-purple-600 dark:text-purple-400">as</span> np
+
+<span class="text-purple-600 dark:text-purple-400">def</span> <span class="text-blue-600 dark:text-blue-400">example_function</span>(x):
+    <span class="text-purple-600 dark:text-purple-400">return</span> np.mean(x)</code></pre>
+            </div>
+        </section>
+
+        <!-- 4. VIDEO LINKS & ACCORDION -->
+        <section class="reveal-section">
+            <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">04. Media & Derivations</span>
+            <h2 class="font-sans text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Видео и Математический вывод</h2>
+            
+            <!-- Video Link -->
+            <div class="my-4 font-sans text-sm">
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Watch Video Lecture: Intuition & Step-by-Step</span>
+                </a>
+            </div>
+
+            <!-- Animated Accordion -->
+            <details class="group my-6 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans">
+                <summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white text-base">
+                    <span>Mathematical Derivation & Proof (Click to expand)</span>
+                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </summary>
+                <div class="accordion-content">
+                    <div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300">
+                        <p>Здесь размещаются объемные выкладки, промежуточные шаги дифференцирования и доказательства теорем, не перегружая основной поток чтения.</p>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+        <!-- 5. COMPARISON TABLES & IMAGES -->
+        <section class="reveal-section">
+            <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">05. Visuals & Tables</span>
+            <h2 class="font-sans text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Таблицы и Изображения</h2>
+            
+            <!-- Image Figure -->
+            <figure class="my-6">
+                <div class="flex flex-col items-center">
+                    <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Linear_regression.svg/800px-Linear_regression.svg.png" 
+                        alt="Example visual" 
+                        class="w-full max-w-[400px] h-auto rounded opacity-85 dark:opacity-75 transition-all hover:opacity-100"
+                    >
+                </div>
+                <figcaption class="mt-3 text-center font-sans text-xs text-gray-400 dark:text-gray-500">
+                    Figure X — Подпись к иллюстрации или графику.
+                </figcaption>
+            </figure>
+
+            <!-- Table -->
+            <div class="my-6 overflow-x-auto no-scrollbar font-sans text-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                            <th class="py-3 pr-4">Parameter</th>
+                            <th class="py-3 px-4">Model A</th>
+                            <th class="py-3 pl-4">Model B</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                        <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                            <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Complexity</td>
+                            <td class="py-3 px-4">Low ($O(N)$)</td>
+                            <td class="py-3 pl-4">High ($O(N^2)$)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 6. GLOSSARY -->
+        <section class="reveal-section">
+            <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">06. Reference</span>
+            <h2 class="font-sans text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Глоссарий терминов</h2>
+            
+            <dl class="space-y-6 font-sans">
+                <div class="transition-transform hover:translate-x-1">
+                    <dt class="font-medium text-gray-800 dark:text-gray-200 text-base">Term Name (Название термина)</dt>
+                    <dd class="mt-1 text-sm text-gray-500 dark:text-gray-400 font-serif">Краткое, емкое определение понятия с академической точностью.</dd>
+                </div>
+            </dl>
+        </section>
+
+    </main>
+
+    <!-- FLOATING CONTROL BAR -->
+    <div class="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 font-sans max-w-[calc(100vw-2rem)]">
+        <nav id="menuList" class="absolute bottom-full left-0 mb-3 w-[280px] max-h-[50vh] overflow-y-auto bg-white/95 dark:bg-darkCard/95 backdrop-blur-md text-gray-700 dark:text-gray-300 rounded-xl p-2 transition-all duration-300 ease-out opacity-0 translate-y-2 scale-95 pointer-events-none shadow-2xl border border-gray-200/60 dark:border-gray-800/80">
+            <ul class="flex flex-col space-y-1 text-sm font-normal">
+                <li><a href="#" class="block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">Top of Page</a></li>
+            </ul>
+        </nav>
+
+        <div id="controlBar" class="bg-white/90 dark:bg-darkCard/90 backdrop-blur-md text-gray-800 dark:text-gray-200 rounded-full px-4 sm:px-5 py-2.5 sm:py-3 shadow-2xl flex items-center gap-3 sm:gap-4 cursor-pointer hover:scale-[1.03] transition-transform duration-200 select-none border border-gray-200/60 dark:border-gray-800/80">
+            <button id="indexBtn" class="flex items-center gap-1.5 text-xs sm:text-sm font-medium focus:outline-none">
+                <span>Index</span>
+            </button>
+            <div class="w-px h-3.5 bg-gray-200 dark:bg-white/20"></div>
+            <button id="themeToggle" class="p-1 text-xs font-medium">Theme</button>
+            <div class="w-px h-3.5 bg-gray-200 dark:bg-white/20"></div>
+            <div class="text-xs sm:text-sm font-medium tabular-nums min-w-[3ch] text-right" id="progressDisplay">0%</div>
+        </div>
+    </div>
+
+    <script>
+        // Scroll Progress & Reveal Observer script
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                } else {
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, { root: null, rootMargin: '0px 0px -5% 0px', threshold: 0.05 });
+
+        document.querySelectorAll('.reveal-section').forEach(section => revealObserver.observe(section));
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            let percent = Math.round((scrollTop / docHeight) * 100);
+            document.getElementById('progressDisplay').textContent = Math.min(100, Math.max(0, percent)) + '%';
+        });
+
+        const controlBar = document.getElementById('controlBar');
+        const menuList = document.getElementById('menuList');
+        let isOpen = false;
+        controlBar.addEventListener('click', () => {
+            isOpen = !isOpen;
+            if(isOpen) {
+                menuList.classList.remove('opacity-0', 'translate-y-2', 'scale-95', 'pointer-events-none');
+            } else {
+                menuList.classList.add('opacity-0', 'translate-y-2', 'scale-95', 'pointer-events-none');
+            }
+        });
+    </script>
+</body>
+</html>
