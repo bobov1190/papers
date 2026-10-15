@@ -1,271 +1,238 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Start of ML and Linear Models</title>
-    <!-- Google Fonts: Inter for headings/UI, Charter/Merriweather style for reading -->
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Lora', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        dark: '#0f0f0f',
+                        darkCard: '#1a1a1a',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/128/2541/2541979.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     
+    <!-- MathJax for LaTeX Formulas -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-main: #292929;
-            --text-secondary: #757575;
-            --accent-color: #1a8917;
-            --border-color: #e6e6e6;
-            --code-bg: #f7f7f7;
-            --quote-border: #292929;
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Lora', Georgia, serif;
-            font-size: 20px;
-            line-height: 1.7;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Medium-style Navigation Bar */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            border-bottom: 1px solid var(--border-color);
-            background: #fff;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav-brand {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 22px;
-            letter-spacing: -0.5px;
-            color: #000;
-            text-decoration: none;
-        }
-
-        .nav-badge {
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            background: #f2f2f2;
-            padding: 6px 14px;
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(150,150,150,0.3);
             border-radius: 20px;
-            color: var(--text-secondary);
-        }
-
-        /* Main Article Container */
-        article {
-            max-width: 680px;
-            margin: 60px auto 120px auto;
-            padding: 0 20px;
-        }
-
-        /* Article Header */
-        .article-header {
-            margin-bottom: 40px;
-        }
-
-        h1.article-title {
-            font-family: 'Inter', sans-serif;
-            font-size: 42px;
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: -1.2px;
-            margin-bottom: 20px;
-            color: #191919;
-        }
-
-        .author-meta {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-top: 24px;
-            padding-bottom: 32px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .author-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 18px;
-        }
-
-        .author-info h4 {
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            color: #191919;
-        }
-
-        .author-info p {
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        /* Typography & Content Styles */
-        p {
-            margin-bottom: 28px;
-        }
-
-        h2 {
-            font-family: 'Inter', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            margin-top: 48px;
-            margin-bottom: 20px;
-            letter-spacing: -0.5px;
-            color: #191919;
-        }
-
-        h3 {
-            font-family: 'Inter', sans-serif;
-            font-size: 22px;
-            font-weight: 600;
-            margin-top: 36px;
-            margin-bottom: 16px;
-            color: #191919;
-        }
-
-        /* Lists */
-        ol, ul {
-            margin-bottom: 28px;
-            padding-left: 24px;
-        }
-
-        li {
-            margin-bottom: 12px;
-            padding-left: 6px;
-        }
-
-        li::marker {
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        /* Code & Formulas */
-        code {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9em;
-            background: var(--code-bg);
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: #c7254e;
-        }
-
-        .formula-box {
-            background: var(--code-bg);
-            border-left: 4px solid var(--accent-color);
-            padding: 20px 24px;
-            margin: 32px 0;
-            border-radius: 0 8px 8px 0;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 16px;
-            overflow-x: auto;
-            color: #111;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-
-        /* Callout / Paragraph Highlight */
-        .intro-lead {
-            font-size: 22px;
-            line-height: 1.6;
-            color: #404040;
-            margin-bottom: 36px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            nav {
-                padding: 16px 20px;
-            }
-            h1.article-title {
-                font-size: 32px;
-            }
-            body {
-                font-size: 18px;
-            }
-            article {
-                margin-top: 30px;
-            }
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-50 dark:bg-dark text-gray-900 dark:text-gray-100 font-serif text-lg leading-relaxed antialiased transition-colors duration-300 selection:bg-emerald-500 selection:text-white">
 
-    <!-- Medium Nav -->
-    <nav>
-        <a href="#" class="nav-brand">Medium</a>
-        <div class="nav-badge">Draft</div>
-    </nav>
+    <!-- Main Article Container -->
+    <main class="max-w-2xl mx-auto px-6 py-20 min-h-[200vh]">
+        
+        <!-- Header -->
+        <header class="mb-16">
+            <span class="font-sans text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block mb-3">Machine Learning Lab • Introductory Series</span>
+            <h1 class="font-sans text-4xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-white">The Start of ML and Linear Models</h1>
+            <p class="font-sans text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+                Hi everybody! Today we are going to go through topics like Linear Regression, Logistic Regression, Likelihood, Loss Functions, Gradient Descent, Adam Optimizer, Softmax Regression, Simple NN and more.
+            </p>
+        </header>
 
-    <!-- Article Content -->
-    <article>
-        <div class="article-header">
-            <h1 class="article-title">The Start of ML and Linear Models</h1>
-            <div class="author-meta">
-                <div class="author-avatar">B</div>
-                <div class="author-info">
-                    <h4>Bahodir</h4>
-                    <p>Published in Machine Learning Lab • 4 min read</p>
+        <!-- Article Content / Sections -->
+        <div class="space-y-16">
+            
+            <!-- Agenda -->
+            <section id="sec-agenda" class="scroll-mt-32 font-sans bg-white dark:bg-darkCard p-8 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Agenda of this Big Introduction Topic</h2>
+                <ol class="list-decimal pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+                    <li>Data and Likelihood</li>
+                    <li>Log Negative Likelihood</li>
+                    <li>Optimizer</li>
+                    <li>Model Families: Linear models and some Classification models</li>
+                    <li>Loss functions and difference between each of them</li>
+                    <li>Linear Regression Explained fully</li>
+                    <li>Logistic Regression Explained fully</li>
+                </ol>
+            </section>
+
+            <!-- Section 1 -->
+            <section id="sec-likelihood" class="scroll-mt-32">
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 01</span>
+                <h2 class="font-sans text-3xl font-bold mb-6 text-gray-900 dark:text-white">Data and Likelihood</h2>
+                
+                <p class="mb-6">
+                    So let's start from the roots of our models, how they have been created, and etc. There is also one more really interesting question: <em>how a model can learn the pattern of data and predict some info from it?</em> And the answer is actually simple: <strong>Likelihood</strong>.
+                </p>
+
+                <p class="mb-6">
+                    Imagine that we have some data and we have a target element to predict. Firstly, we are going to talk only about tabular datasets. So let's say that we can predict either numbers or classes.
+                </p>
+
+                <p class="mb-6">
+                    The example with the number can be the temperature prediction made on wind speed and humidity and etc. An example with the class can be within spam/not spam problem in your email or Telegram.
+                </p>
+
+                <p class="mb-6">
+                    So actually we have got the idea that we have data. Okay, now we need to define a model with which we are going to predict our approximate answer. Why is it approximate? The right answer would be because we are humans, so we cannot make a system which is going to make the absolute rightest predictions. But there are also some actually grounded explanations for it, which we are going to talk about later.
+                </p>
+
+                <p class="mb-6">
+                    So in the system of approximate solution, data, and model, our main goal is to define the best possible model to predict as right as possible. And here we are going to observe the idea of likelihood.
+                </p>
+
+                <!-- Formula Box with LaTeX -->
+                <div class="my-8 p-6 bg-gray-100 dark:bg-gray-900 border-l-4 border-emerald-500 rounded-r-xl overflow-x-auto shadow-inner">
+                    <div class="text-center font-mono">
+                        $$\mathcal{L}(w \mid X, y) = P(y, X \mid w) = \arg\max_{w} P(y \mid X, w)$$
+                    </div>
                 </div>
+
+                <p class="mb-6">
+                    So what it is trying to say to us is that we need the best weights to predict the most approximate answer for our question.
+                </p>
+            </section>
+
+        </div>
+
+        <footer class="mt-32 pt-8 border-t border-gray-200 dark:border-gray-800 font-sans text-sm text-gray-500 flex justify-between items-center">
+            <p>© 2026 Machine Learning Lab</p>
+            <p>Built with Medium & Tailwind UI</p>
+        </footer>
+    </main>
+
+    <!-- Floating Widget (Index Menu + Progress + Dark Mode) -->
+    <div class="fixed bottom-6 left-6 z-50 flex flex-col items-start font-sans">
+        
+        <!-- Dropdown Menu -->
+        <nav id="menuList" class="mb-3 bg-white/95 dark:bg-darkCard/95 backdrop-blur-md text-gray-700 dark:text-gray-300 rounded-2xl p-2 min-w-[280px] origin-bottom-left transition-all duration-300 ease-out opacity-0 translate-y-4 scale-90 pointer-events-none shadow-2xl border border-gray-200 dark:border-gray-800">
+            <ul class="flex flex-col space-y-1">
+                <li><a href="#sec-agenda" class="menu-link block px-4 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">📋 Agenda</a></li>
+                <li><a href="#sec-likelihood" class="menu-link block px-4 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">01. Data and Likelihood</a></li>
+            </ul>
+        </nav>
+
+        <!-- Control Bar -->
+        <div id="controlBar" class="bg-gray-900 dark:bg-darkCard text-white rounded-full px-5 py-3 shadow-2xl flex items-center gap-4 cursor-pointer hover:scale-[1.02] transition-transform duration-200 select-none border border-gray-800">
+            
+            <!-- Index Toggle Button -->
+            <button id="indexBtn" class="flex items-center gap-2 text-sm font-medium focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+                <span>Index</span>
+                <svg id="arrowIcon" class="w-2.5 h-2.5 transition-transform duration-300 ml-1" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 5L5 1L9 5"/>
+                </svg>
+            </button>
+
+            <div class="w-px h-4 bg-white/20"></div>
+
+            <!-- Dark Mode Toggle Button -->
+            <button id="themeToggle" class="p-1 hover:text-emerald-400 transition-colors focus:outline-none" title="Toggle Theme">
+                <!-- Sun Icon -->
+                <svg id="sunIcon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <!-- Moon Icon -->
+                <svg id="moonIcon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+
+            <div class="w-px h-4 bg-white/20"></div>
+
+            <!-- Progress Display -->
+            <div class="text-sm font-medium tabular-nums min-w-[3ch] text-right" id="progressDisplay">
+                0%
             </div>
         </div>
+    </div>
 
-        <p class="intro-lead">Hi everybody! Today we are going to go through topics like Linear Regression and Logistic Regression. And that is not the only thing, but also it is about Likelihood, Loss Functions, Gradient Descent Optimizer, Adam Optimizer, Softmax Regression, Simple NN and so on. So as you can see, it is a really huge topic to talk about because it gathers the first beginner's ideas and solves fundamental questions.</p>
+    <!-- Script for Interactivity -->
+    <script>
+        const controlBar = document.getElementById('controlBar');
+        const indexBtn = document.getElementById('indexBtn');
+        const menuList = document.getElementById('menuList');
+        const arrowIcon = document.getElementById('arrowIcon');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const links = document.querySelectorAll('.menu-link');
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        let isOpen = false;
 
-        <h2>Agenda of this Big Introduction Topic</h2>
-        <ol>
-            <li>Data and Likelihood</li>
-            <li>Log Negative Likelihood</li>
-            <li>Optimizer</li>
-            <li>Model Families: Linear models and some Classification models</li>
-            <li>Loss functions and difference between each of them</li>
-            <li>Linear Regression Explained fully</li>
-            <li>Logistic Regression Explained fully</li>
-        </ol>
+        // 1. Menu Toggle Logic
+        function toggleMenu() {
+            isOpen = !isOpen;
+            if (isOpen) {
+                menuList.classList.remove('opacity-0', 'translate-y-4', 'scale-90', 'pointer-events-none');
+                arrowIcon.classList.add('rotate-180');
+            } else {
+                menuList.classList.add('opacity-0', 'translate-y-4', 'scale-90', 'pointer-events-none');
+                arrowIcon.classList.remove('rotate-180');
+            }
+        }
 
-        <h2>Data and Likelihood</h2>
-        <p>So let's start from the roots of our models, how they have been created, and etc. There is also one more really interesting question: <em>how a model can learn the pattern of data and predict some info from it?</em> And the answer is actually simple: <strong>Likelihood</strong>.</p>
+        controlBar.addEventListener('click', (e) => {
+            if (e.target.closest('#themeToggle')) return; // Don't open menu when clicking theme toggle
+            toggleMenu();
+        });
 
-        <p>Imagine that we have some data and we have a target element to predict. Firstly, we are going to talk only about tabular datasets. So let's say that we can predict either numbers or classes.</p>
+        document.addEventListener('click', (e) => {
+            if (!menuList.contains(e.target) && !controlBar.contains(e.target)) {
+                if (isOpen) toggleMenu();
+            }
+        });
 
-        <p>The example with the number can be the temperature prediction made on wind speed and humidity and etc. An example with the class can be within spam/not spam problem in your email or Telegram.</p>
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                if (isOpen) toggleMenu();
+            });
+        });
 
-        <p>So actually we have got the idea that we have data. Okay, now we need to define a model with which we are going to predict our approximate answer. Why is it approximate? The right answer would be because we are humans, so we cannot make a system which is going to make the absolute rightest predictions. But there are also some actually grounded explanations for it, which we are going to talk about later.</p>
+        // 2. Dark Mode Toggle Logic
+        themeToggle.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
 
-        <p>So in the system of approximate solution, data, and model, our main goal is to define the best possible model to predict as right as possible. And here we are going to observe the idea of likelihood.</p>
+        // 3. Scroll Progress Calculation
+        function updateProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            let scrollPercent = Math.round((scrollTop / docHeight) * 100);
+            
+            if (scrollPercent < 0) scrollPercent = 0;
+            if (scrollPercent > 100) scrollPercent = 100;
+            
+            progressDisplay.textContent = scrollPercent + '%';
+        }
 
-        <div class="formula-box">
-            L(w | X, y) = P(y, X | w) = argmax w
-        </div>
-
-        <p>So what it is trying to say to us is that we need the best weights to predict the most approximate answer for our question.</p>
-    </article>
-
+        window.addEventListener('scroll', updateProgress);
+        window.addEventListener('resize', updateProgress);
+    </script>
 </body>
 </html>
