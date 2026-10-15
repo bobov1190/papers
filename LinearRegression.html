@@ -72,7 +72,7 @@
             scrollbar-width: none;
         }
 
-        /* Плавное появление секций при скролле */
+        /* Плавное повторное появление секций при скролле */
         .reveal-section {
             opacity: 0;
             transform: translateY(16px);
@@ -81,6 +81,28 @@
         .reveal-section.active {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* Плавная анимация раскрытия аккордеона без рывков */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .accordion-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            opacity: 0;
+        }
+        details[open] .accordion-content {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+        .accordion-content > div {
+            overflow: hidden;
         }
 
         /* Плавные переходы для интерактивных элементов */
@@ -94,7 +116,7 @@
     <!-- Main Article Container -->
     <main class="max-w-2xl mx-auto px-5 sm:px-6 py-16 sm:py-28 min-h-[200vh] w-full">
         
-        <!-- Header -->
+        <!-- Header (Большой солидный заголовок) -->
         <header class="mb-16 sm:mb-24 reveal-section">
             <h1 class="font-sans text-3xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-gray-100 leading-tight">The Start of ML and Linear Models</h1>
             <p class="font-sans text-lg sm:text-xl text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
@@ -214,7 +236,7 @@
                     </a>
                 </div>
 
-                <!-- Minimalist Accordion -->
+                <!-- Minimalist Animated Accordion -->
                 <details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors">
                     <summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base">
                         <span>Mathematical Derivation & Gradient Update Rules</span>
@@ -222,14 +244,16 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </summary>
-                    <div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300">
-                        <p>To find the minimum of our loss function $J(w)$, we compute the partial derivative with respect to weights $w$:</p>
-                        <div class="overflow-x-auto py-2 no-scrollbar text-gray-900 dark:text-gray-100">
-                            $$\frac{\partial J}{\partial w} = -\frac{1}{N} \sum_{i=1}^{N} (y_i - x_i^T w) x_i$$
-                        </div>
-                        <p>Then we apply the iterative update rule with learning rate $\alpha$:</p>
-                        <div class="overflow-x-auto py-2 no-scrollbar text-gray-900 dark:text-gray-100">
-                            $$w^{(t+1)} = w^{(t)} - \alpha \frac{\partial J}{\partial w}$$
+                    <div class="accordion-content">
+                        <div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300">
+                            <p>To find the minimum of our loss function $J(w)$, we compute the partial derivative with respect to weights $w$:</p>
+                            <div class="overflow-x-auto py-2 no-scrollbar text-gray-900 dark:text-gray-100">
+                                $$\frac{\partial J}{\partial w} = -\frac{1}{N} \sum_{i=1}^{N} (y_i - x_i^T w) x_i$$
+                            </div>
+                            <p>Then we apply the iterative update rule with learning rate $\alpha$:</p>
+                            <div class="overflow-x-auto py-2 no-scrollbar text-gray-900 dark:text-gray-100">
+                                $$w^{(t+1)} = w^{(t)} - \alpha \frac{\partial J}{\partial w}$$
+                            </div>
                         </div>
                     </div>
                 </details>
@@ -442,18 +466,19 @@
         window.addEventListener('scroll', updateProgress);
         window.addEventListener('resize', updateProgress);
 
-        // 4. Scroll Reveal Observer for Sections (Fade-In-Up)
-        const revealObserver = new IntersectionObserver((entries, observer) => {
+        // 4. Repeating Scroll Reveal Observer for Sections (Fade-In-Up)
+        const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('active');
-                    observer.unobserve(entry.target);
+                } else {
+                    entry.target.classList.remove('active'); // Повторяем анимацию при прокрутке обратно
                 }
             });
         }, {
             root: null,
-            rootMargin: '0px 0px -10% 0px',
-            threshold: 0.1
+            rootMargin: '0px 0px -5% 0px',
+            threshold: 0.05
         });
 
         document.querySelectorAll('.reveal-section').forEach(section => {
