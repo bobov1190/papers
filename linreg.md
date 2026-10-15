@@ -12,3 +12,6 @@ So let's start from agenda of this big introduction topic:
 5. Loss functions and difference between each of them
 6. Linear Regression Explained fully
 7. Logistic Regression Explained fully
+
+
+
