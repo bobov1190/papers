@@ -64,10 +64,10 @@
         <!-- Article Content / Sections -->
         <div class="space-y-16">
             
-            <!-- Agenda -->
-            <section id="sec-agenda" class="scroll-mt-32 font-sans bg-white dark:bg-darkCard p-8 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
-                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Agenda of this Big Introduction Topic</h2>
-                <ol class="list-decimal pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+            <!-- Agenda (Clean & Minimal) -->
+            <section id="sec-agenda" class="scroll-mt-32">
+                <h2 class="font-sans text-2xl font-bold mb-4 text-gray-900 dark:text-white">Agenda of this Big Introduction Topic</h2>
+                <ol class="font-sans list-decimal pl-5 space-y-2 text-gray-700 dark:text-gray-300">
                     <li>Data and Likelihood</li>
                     <li>Log Negative Likelihood</li>
                     <li>Optimizer</li>
@@ -119,7 +119,7 @@
 
         <footer class="mt-32 pt-8 border-t border-gray-200 dark:border-gray-800 font-sans text-sm text-gray-500 flex justify-between items-center">
             <p>© 2026 Machine Learning Lab</p>
-            <p>Built with Medium & Tailwind UI</p>
+            <p>Built with Tailwind UI</p>
         </footer>
     </main>
 
@@ -192,7 +192,7 @@
         }
 
         controlBar.addEventListener('click', (e) => {
-            if (e.target.closest('#themeToggle')) return; // Don't open menu when clicking theme toggle
+            if (e.target.closest('#themeToggle')) return; 
             toggleMenu();
         });
 
