@@ -113,24 +113,45 @@
                     So let's start from the roots of our models, how they have been created, and etc. There is also one more really interesting question: <em>how a model can learn the pattern of data and predict some info from it?</em> And the answer is actually simple: <strong>Likelihood</strong>.
                 </p>
 
-                <!-- Callout / Note Box (Minimalist) -->
-                <div class="my-6 p-4 sm:p-5 rounded-xl bg-gray-100 dark:bg-gray-900/50 border-l-2 border-gray-400 dark:border-gray-600 font-sans text-base text-gray-700 dark:text-gray-300">
-                    <span class="font-semibold text-gray-900 dark:text-white">Intuition Check:</span> Tabular data maps features matrix $X$ to target vector $y$. Think of features as columns and instances as rows.
+                <!-- Minimalist Note (No Card Background) -->
+                <div class="my-6 pl-4 border-l-2 border-gray-400 dark:border-gray-600 font-sans text-base text-gray-600 dark:text-gray-400 italic">
+                    <span class="font-semibold text-gray-900 dark:text-white not-italic">Intuition Check:</span> Tabular data maps features matrix $X$ to target vector $y$. Think of features as columns and instances as rows.
                 </div>
 
                 <p class="mb-6">
                     Imagine that we have some data and we have a target element to predict. Firstly, we are going to talk only about tabular datasets. So let's say that we can predict either numbers or classes.
                 </p>
 
-                <!-- Image / Figure Container -->
+                <!-- Real SVG Chart / Figure -->
                 <figure class="my-8">
-                    <div class="rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 flex items-center justify-center p-2">
-                        <!-- Пример подключения реальной картинки: <img src="path/to/image.png" alt="Likelihood concept" class="rounded-lg w-full h-auto"> -->
-                        <div class="py-12 text-center font-sans text-sm text-gray-500">
-                            [Figure 1.1: Data Distribution and Hypothesis Space Visualization]
-                        </div>
+                    <div class="rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 flex flex-col items-center shadow-sm">
+                        <!-- Embedded Clean SVG Data Distribution & Regression Line Chart -->
+                        <svg class="w-full max-w-[420px] h-auto" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Grid lines -->
+                            <line x1="40" y1="200" x2="380" y2="200" stroke="currentColor" stroke-opacity="0.15" stroke-width="1"/>
+                            <line x1="40" y1="140" x2="380" y2="140" stroke="currentColor" stroke-opacity="0.15" stroke-width="1"/>
+                            <line x1="40" y1="80" x2="380" y2="80" stroke="currentColor" stroke-opacity="0.15" stroke-width="1"/>
+                            <line x1="40" y1="20" x2="380" y2="20" stroke="currentColor" stroke-opacity="0.15" stroke-width="1"/>
+                            
+                            <!-- Regression Line -->
+                            <line x1="50" y1="180" x2="370" y2="40" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
+                            
+                            <!-- Data Points (Scatter) -->
+                            <circle cx="60" cy="170" r="4" fill="#6366f1" opacity="0.8"/>
+                            <circle cx="90" cy="155" r="4" fill="#6366f1" opacity="0.8"/>
+                            <circle cx="110" cy="130" r="4" fill="#6366f1" opacity="0.8"/>
+                            <circle cx="140" cy="140" r="4" fill="#6366f1" opacity="0.8"/>
+                            <circle cx="170" cy="105" r="4" fill="#6366f1" opacity="0.8"/>
+                            <circle cx="200" cy="110" r="4" fill="#6366f1" opacity="0.8"/>
+                            <circle cx="230" cy="85" r="4" fill="#6366f1" opacity="0.8"/>
+                            <circle cx="260" cy="70" r="4" fill="#6366f1" opacity="0.8"/>
+                            <circle cx="290" cy="75" r="4" fill="#6366f1" opacity="0.8"/>
+                            <circle cx="330" cy="50" r="4" fill="#6366f1" opacity="0.8"/>
+                            <circle cx="350" cy="45" r="4" fill="#6366f1" opacity="0.8"/>
+                        </svg>
+                        <span class="mt-3 font-sans text-xs text-gray-500 tracking-wider uppercase">Fig 1.1: Linear Fit over Data Distribution</span>
                     </div>
-                    <figcaption class="mt-3 text-center font-sans text-xs text-gray-500">
+                    <figcaption class="mt-2.5 text-center font-sans text-xs text-gray-500">
                         Figure 1.1 — Mapping data observations to parameter space via Likelihood estimation.
                     </figcaption>
                 </figure>
@@ -148,7 +169,7 @@
 
             <!-- Section 2 -->
             <section id="sec-log-likelihood" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 02</span>
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 02</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Log Negative Likelihood</h2>
                 <p class="mb-6">
                     Working with products of probabilities can lead to numerical underflow. To prevent this, we apply the logarithm, turning multiplication into summation and making optimization stable.
@@ -168,30 +189,27 @@
 
             <!-- Section 3 -->
             <section id="sec-optimizer" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 03</span>
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 03</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Optimizer & Gradient Descent</h2>
                 <p class="mb-6">
                     Optimizers like Gradient Descent and Adam help us iteratively update our model weights to minimize the loss function and find the optimal parameters.
                 </p>
 
-                <!-- Embedded Video Tutorial Container -->
-                <div class="my-8">
-                    <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-200 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 shadow-lg">
-                        <!-- Пример встраивания YouTube видео: <iframe class="absolute inset-0 w-full h-full" src="https://www.youtube.com/embed/YOUR_VIDEO_ID" frameborder="0" allowfullscreen></iframe> -->
-                        <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center font-sans text-sm text-gray-500">
-                            <svg class="w-12 h-12 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span>[Video Lecture: Gradient Descent Intuition & Step-by-Step]</span>
-                        </div>
-                    </div>
+                <!-- Minimalist Text Link instead of Big Rectangle Box -->
+                <div class="my-6 font-sans">
+                    <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium hover:underline underline-offset-4 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Watch Video Lecture: Gradient Descent Intuition & Step-by-Step</span>
+                    </a>
                 </div>
 
-                <!-- Collapsible Mathematical Proof / Accordion -->
-                <details class="my-6 p-4 sm:p-5 rounded-xl bg-gray-100 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-800 font-sans transition-all">
+                <!-- Flat Minimalist Accordion (No Card Background) -->
+                <details class="my-6 py-3 border-y border-gray-200 dark:border-gray-800 font-sans transition-all">
                     <summary class="cursor-pointer font-semibold text-gray-900 dark:text-white flex items-center justify-between select-none">
                         <span>Mathematical Derivation & Gradient Update Rules</span>
-                        <span class="text-xs text-gray-500">Expand ▾</span>
+                        <span class="text-xs text-gray-500 font-mono">expand ▾</span>
                     </summary>
-                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800 text-base space-y-3 font-serif">
+                    <div class="mt-4 pt-2 text-base space-y-3 font-serif text-gray-700 dark:text-gray-300">
                         <p>To find the minimum of our loss function $J(w)$, we compute the partial derivative with respect to weights $w$:</p>
                         <div class="overflow-x-auto py-2">
                             $$\frac{\partial J}{\partial w} = -\frac{1}{N} \sum_{i=1}^{N} (y_i - x_i^T w) x_i$$
@@ -206,7 +224,7 @@
 
             <!-- Section 4 -->
             <section id="sec-models" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 04</span>
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 04</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Model Families</h2>
                 <p class="mb-6">
                     Linear models form the cornerstone of machine learning. They are interpretable, fast to train, and serve as the foundation for deep neural networks.
@@ -215,7 +233,7 @@
 
             <!-- Section 5 -->
             <section id="sec-loss" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 05</span>
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 05</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Loss Functions</h2>
                 <p class="mb-6">
                     Different tasks require different loss metrics, such as Mean Squared Error (MSE) for regression and Cross-Entropy for classification.
@@ -224,7 +242,7 @@
 
             <!-- Section 6 -->
             <section id="sec-linear" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 06</span>
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 06</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Linear Regression Explained Fully</h2>
                 <p class="mb-6">
                     Linear regression models the relationship between a continuous target variable and one or more explanatory features using a linear equation.
@@ -233,7 +251,7 @@
 
             <!-- Section 7 -->
             <section id="sec-logistic" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 07</span>
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 07</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Logistic Regression Explained Fully</h2>
                 <p class="mb-6">
                     Logistic regression applies the sigmoid function to map predicted values into probabilities, solving binary classification problems effectively.
