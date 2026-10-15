@@ -128,9 +128,9 @@
                     Working with products of probabilities can lead to numerical underflow. To prevent this, we apply the logarithm, turning multiplication into summation and making optimization stable.
                 </p>
                 
-                <!-- Terminal Code Block Example -->
-                <div class="my-6 rounded-xl bg-gray-900 text-gray-200 font-mono text-sm overflow-hidden shadow-xl border border-gray-800">
-                    <div class="flex items-center justify-between px-4 py-2.5 bg-gray-950 border-b border-gray-800 text-xs text-gray-400">
+                <!-- Theme-Adaptive Terminal Code Block with Python Syntax Highlighting -->
+                <div class="my-6 rounded-xl bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-mono text-sm overflow-hidden shadow-xl border border-gray-200 dark:border-gray-800 transition-colors duration-300">
+                    <div class="flex items-center justify-between px-4 py-2.5 bg-gray-200/70 dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 text-xs text-gray-500 dark:text-gray-400">
                         <span>negative_log_likelihood.py</span>
                         <div class="flex gap-1.5">
                             <div class="w-2.5 h-2.5 rounded-full bg-red-500/80"></div>
@@ -138,13 +138,13 @@
                             <div class="w-2.5 h-2.5 rounded-full bg-green-500/80"></div>
                         </div>
                     </div>
-                    <pre class="p-4 overflow-x-auto no-scrollbar text-emerald-400"><code>import numpy as np
+                    <pre class="p-4 overflow-x-auto no-scrollbar leading-relaxed"><code><span class="text-purple-600 dark:text-purple-400 font-semibold">import</span> numpy <span class="text-purple-600 dark:text-purple-400 font-semibold">as</span> np
 
-def negative_log_likelihood(y_true, y_pred):
-    eps = 1e-15
-    y_pred = np.clip(y_pred, eps, 1 - eps)
-    nll = -np.sum(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
-    return nll</code></pre>
+<span class="text-purple-600 dark:text-purple-400 font-semibold">def</span> <span class="text-blue-600 dark:text-blue-400 font-medium">negative_log_likelihood</span>(y_true, y_pred):
+    eps = <span class="text-orange-600 dark:text-orange-400">1e-15</span>
+    y_pred = np.clip(y_pred, eps, <span class="text-orange-600 dark:text-orange-400">1</span> - eps)
+    nll = -np.sum(y_true * np.log(y_pred) + (<span class="text-orange-600 dark:text-orange-400">1</span> - y_true) * np.log(<span class="text-orange-600 dark:text-orange-400">1</span> - y_pred))
+    <span class="text-purple-600 dark:text-purple-400 font-semibold">return</span> nll</code></pre>
                 </div>
             </section>
 
