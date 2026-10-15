@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth dark">
+<html lang="en" class="scroll-smooth dark overflow-x-hidden">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Start of ML and Linear Models</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -35,8 +35,17 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
+        /* Полное устранение горизонтального скролла */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Кастомный кастомный вертикальный скроллбар */
         ::-webkit-scrollbar {
             width: 6px;
+            height: 0px; /* Скрываем любые горизонтальные скроллбары элементов */
         }
         ::-webkit-scrollbar-track {
             background: transparent;
@@ -45,24 +54,33 @@
             background-color: rgba(150,150,150,0.3);
             border-radius: 20px;
         }
+
+        /* Скрытие скроллбара в формуле */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-dark text-gray-900 dark:text-gray-100 font-serif text-lg leading-relaxed antialiased transition-colors duration-300 selection:bg-gray-300 dark:selection:bg-gray-700 selection:text-black dark:selection:text-white">
+<body class="bg-gray-50 dark:bg-dark text-gray-900 dark:text-gray-100 font-serif text-lg leading-relaxed antialiased transition-colors duration-300 selection:bg-gray-300 dark:selection:bg-gray-700 selection:text-black dark:selection:text-white overflow-x-hidden">
 
     <!-- Main Article Container -->
-    <main class="max-w-2xl mx-auto px-5 sm:px-6 py-16 sm:py-24 min-h-[200vh]">
+    <main class="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-24 min-h-[200vh] w-full overflow-x-hidden">
         
         <!-- Header -->
-        <header class="mb-14">
+        <header class="mb-12 sm:mb-16">
             <span class="font-sans text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 block mb-3">Machine Learning Lab • Introductory Series</span>
-            <h1 class="font-sans text-3xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-white">The Start of ML and Linear Models</h1>
+            <h1 class="font-sans text-3xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-white break-words">The Start of ML and Linear Models</h1>
             <p class="font-sans text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
                 Hi everybody! Today we are going to go through topics like Linear Regression, Logistic Regression, Likelihood, Loss Functions, Gradient Descent, Adam Optimizer, Softmax Regression, Simple NN and more.
             </p>
         </header>
 
         <!-- Article Content / Sections -->
-        <div class="space-y-16">
+        <div class="space-y-12 sm:space-y-16 w-full">
             
             <!-- Agenda -->
             <section id="sec-agenda" class="scroll-mt-28">
@@ -79,9 +97,9 @@
             </section>
 
             <!-- Section 1 -->
-            <section id="sec-likelihood" class="scroll-mt-28">
+            <section id="sec-likelihood" class="scroll-mt-28 w-full">
                 <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 01</span>
-                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white">Data and Likelihood</h2>
+                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Data and Likelihood</h2>
                 
                 <p class="mb-6">
                     So let's start from the roots of our models, how they have been created, and etc. There is also one more really interesting question: <em>how a model can learn the pattern of data and predict some info from it?</em> And the answer is actually simple: <strong>Likelihood</strong>.
@@ -103,9 +121,9 @@
                     So in the system of approximate solution, data, and model, our main goal is to define the best possible model to predict as right as possible. And here we are going to observe the idea of likelihood.
                 </p>
 
-                <!-- Clean LaTeX Formula -->
-                <div class="my-8 overflow-x-auto py-2">
-                    <div class="text-center min-w-[300px]">
+                <!-- Clean LaTeX Formula (Responsive & Anti-Overflow) -->
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full">
                         $$\mathcal{L}(w \mid X, y) = P(y, X \mid w) = \arg\max_{w} P(y \mid X, w)$$
                     </div>
                 </div>
@@ -117,26 +135,26 @@
 
         </div>
 
-        <footer class="mt-28 pt-8 border-t border-gray-200 dark:border-gray-800 font-sans text-sm text-gray-500 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <footer class="mt-24 sm:mt-28 pt-8 border-t border-gray-200 dark:border-gray-800 font-sans text-sm text-gray-500 flex flex-col sm:flex-row justify-between items-center gap-4">
             <p>© 2026 Machine Learning Lab</p>
             <p>Minimalist Edition</p>
         </footer>
     </main>
 
     <!-- Floating Reader Widget (Index Menu + Progress + Dark Mode) -->
-    <div class="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 font-sans">
+    <div class="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 font-sans max-w-[calc(100vw-2rem)]">
         
-        <!-- Dropdown Menu (Fixed positioning & width relative to viewport on mobile) -->
-        <nav id="menuList" class="absolute bottom-full left-0 mb-3 w-[calc(100vw-2rem)] sm:w-[320px] max-h-[50vh] overflow-y-auto bg-white/95 dark:bg-darkCard/95 backdrop-blur-md text-gray-700 dark:text-gray-300 rounded-2xl p-2 transition-all duration-300 ease-out opacity-0 translate-y-2 scale-95 pointer-events-none shadow-2xl border border-gray-200 dark:border-gray-800">
+        <!-- Dropdown Menu -->
+        <nav id="menuList" class="absolute bottom-full left-0 mb-3 w-[280px] max-w-[calc(100vw-2rem)] max-h-[50vh] overflow-y-auto bg-white/95 dark:bg-darkCard/95 backdrop-blur-md text-gray-700 dark:text-gray-300 rounded-2xl p-2 transition-all duration-300 ease-out opacity-0 translate-y-2 scale-95 pointer-events-none shadow-2xl border border-gray-200 dark:border-gray-800">
             <ul class="flex flex-col space-y-1">
-                <li><a href="#sec-agenda" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">Agenda</a></li>
-                <li><a href="#sec-likelihood" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">1. Data and Likelihood</a></li>
-                <li><a href="#item-2" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">2. Log Negative Likelihood</a></li>
-                <li><a href="#item-3" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">3. Optimizer</a></li>
-                <li><a href="#item-4" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">4. Model Families</a></li>
-                <li><a href="#item-5" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">5. Loss functions</a></li>
-                <li><a href="#item-6" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">6. Linear Regression</a></li>
-                <li><a href="#item-7" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">7. Logistic Regression</a></li>
+                <li><a href="#sec-agenda" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">Agenda</a></li>
+                <li><a href="#sec-likelihood" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">1. Data and Likelihood</a></li>
+                <li><a href="#item-2" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">2. Log Negative Likelihood</a></li>
+                <li><a href="#item-3" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">3. Optimizer</a></li>
+                <li><a href="#item-4" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">4. Model Families</a></li>
+                <li><a href="#item-5" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">5. Loss functions</a></li>
+                <li><a href="#item-6" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">6. Linear Regression</a></li>
+                <li><a href="#item-7" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium truncate">7. Logistic Regression</a></li>
             </ul>
         </nav>
 
