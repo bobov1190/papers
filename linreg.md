@@ -21,3 +21,5 @@ So let's start from the roots of our models. How they have been created and etc.
 So imagine that we have some data and we have have target element to predict. So firstly, we are going talk about only tabular datasets. So let's say that we can predict either numbers or classes.
 
 The example with the number can be the temperature prediction made on wind speed and humidity and etc. And example with the class can be within spam/not spam problem in your email or tg.
+
+
