@@ -35,7 +35,7 @@
         window.MathJax = {
             tex: {
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['[', ']']]
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
             }
         };
     </script>
@@ -103,11 +103,12 @@
                 <ol class="font-sans list-decimal pl-5 space-y-2 text-gray-700 dark:text-gray-300">
                     <li>Data and Likelihood</li>
                     <li>Log Negative Likelihood</li>
-                    <li>Optimizer</li>
-                    <li>Model Families: Linear models and some Classification models</li>
-                    <li>Loss functions and difference between each of them</li>
-                    <li>Linear Regression Explained fully</li>
-                    <li>Logistic Regression Explained fully</li>
+                    <li>Optimizer & Gradient</li>
+                    <li>Model Families & Comparison</li>
+                    <li>Loss Functions</li>
+                    <li>Linear Regression Explained</li>
+                    <li>Logistic Regression Explained</li>
+                    <li>Glossary & Terminology</li>
                 </ol>
             </section>
 
@@ -133,7 +134,7 @@
                 <figure class="my-8">
                     <div class="flex flex-col items-center">
                         <img 
-                            src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Linear_regression%2C_rotating_coordinate_system.gif?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" 
+                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Linear_regression.svg/800px-Linear_regression.svg.png" 
                             alt="Linear Regression Data Fit" 
                             class="w-full max-w-[460px] h-auto rounded-lg opacity-90 dark:opacity-80 transition-opacity"
                         >
@@ -162,8 +163,18 @@
                     Working with products of probabilities can lead to numerical underflow. To prevent this, we apply the logarithm, turning multiplication into summation and making optimization stable.
                 </p>
                 
+                <!-- Google Colab Link (Valid Icon) -->
+                <div class="my-3 flex items-center gap-2 font-sans text-xs">
+                    <a href="https://colab.research.google.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                        <svg class="w-3.5 h-3.5 text-amber-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16.5 3H7.5C5.01 3 3 5.01 3 7.5v9C3 18.99 5.01 21 7.5 21h9c2.49 0 4.5-2.01 4.5-4.5v-9C21 5.01 18.99 3 16.5 3zM12 17.25c-2.9 0-5.25-2.35-5.25-5.25S9.1,6.75,12,6.75s5.25,2.35,5.25,5.25S14.9,17.25,12,17.25z"/>
+                        </svg>
+                        <span>Open implementation in Google Colab</span>
+                    </a>
+                </div>
+
                 <!-- Flat Code Block -->
-                <div class="my-6 rounded-xl bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-mono text-sm overflow-x-auto no-scrollbar border border-gray-200 dark:border-gray-800 p-5 transition-colors duration-300">
+                <div class="my-4 rounded-xl bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-mono text-sm overflow-x-auto no-scrollbar border border-gray-200 dark:border-gray-800 p-5 transition-colors duration-300">
                     <pre class="leading-relaxed"><code><span class="text-purple-600 dark:text-purple-400 font-semibold">import</span> numpy <span class="text-purple-600 dark:text-purple-400 font-semibold">as</span> np
 
 <span class="text-purple-600 dark:text-purple-400 font-semibold">def</span> <span class="text-blue-600 dark:text-blue-400 font-medium">negative_log_likelihood</span>(y_true, y_pred):
@@ -182,6 +193,11 @@
                     Optimizers like Gradient Descent and Adam help us iteratively update our model weights to minimize the loss function and find the optimal parameters.
                 </p>
 
+                <!-- Common Pitfall Block -->
+                <div class="my-6 pl-4 border-l-2 border-amber-500/80 font-sans text-base text-gray-600 dark:text-gray-400 italic">
+                    <span class="font-semibold text-gray-900 dark:text-white not-italic">Common Pitfall:</span> Failing to standardize feature scales before applying gradient descent causes loss contours to elongate, leading to wild oscillations and convergence failure.
+                </div>
+
                 <!-- Minimalist Text Link -->
                 <div class="my-6 font-sans">
                     <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium hover:underline underline-offset-4 transition-all">
@@ -190,7 +206,7 @@
                     </a>
                 </div>
 
-                <!-- Minimalist Accordion Integrated into Design Philosophy -->
+                <!-- Minimalist Accordion -->
                 <details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800 font-sans transition-colors">
                     <summary class="cursor-pointer font-semibold text-gray-900 dark:text-white flex items-center justify-between select-none group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                         <span>Mathematical Derivation & Gradient Update Rules</span>
@@ -214,10 +230,40 @@
             <!-- Section 4 -->
             <section id="sec-models" class="scroll-mt-28 w-full">
                 <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 04</span>
-                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Model Families</h2>
+                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Model Families & Comparison</h2>
                 <p class="mb-6">
                     Linear models form the cornerstone of machine learning. They are interpretable, fast to train, and serve as the foundation for deep neural networks.
                 </p>
+
+                <!-- Comparison Table -->
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white font-semibold">
+                                <th class="py-3 pr-4">Property</th>
+                                <th class="py-3 px-4">Linear Regression</th>
+                                <th class="py-3 pl-4">Logistic Regression</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr>
+                                <td class="py-3 pr-4 font-medium text-gray-900 dark:text-white">Task Type</td>
+                                <td class="py-3 px-4">Regression (Continuous)</td>
+                                <td class="py-3 pl-4">Classification (Binary)</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 pr-4 font-medium text-gray-900 dark:text-white">Output Range</td>
+                                <td class="py-3 px-4">$(-\infty, +\infty)$</td>
+                                <td class="py-3 pl-4">$(0, 1)$ via Sigmoid</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 pr-4 font-medium text-gray-900 dark:text-white">Loss Function</td>
+                                <td class="py-3 px-4">Mean Squared Error (MSE)</td>
+                                <td class="py-3 pl-4">Binary Cross-Entropy</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </section>
 
             <!-- Section 5 -->
@@ -247,6 +293,27 @@
                 </p>
             </section>
 
+            <!-- Section 8 -->
+            <section id="sec-glossary" class="scroll-mt-28 w-full">
+                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Reference</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Glossary & Terminology</h2>
+                
+                <dl class="space-y-6 font-sans">
+                    <div>
+                        <dt class="font-semibold text-gray-900 dark:text-white text-base">Loss Function (Функция потерь)</dt>
+                        <dd class="mt-1 text-sm text-gray-600 dark:text-gray-400 font-serif">A method of quantifying how well a model aligns with the training data by mapping predictions to a scalar cost value.</dd>
+                    </div>
+                    <div>
+                        <dt class="font-semibold text-gray-900 dark:text-white text-base">Regularization (Регуляризация)</dt>
+                        <dd class="mt-1 text-sm text-gray-600 dark:text-gray-400 font-serif">A technique used to prevent overfitting by adding a penalty term to the loss function based on model weight magnitudes.</dd>
+                    </div>
+                    <div>
+                        <dt class="font-semibold text-gray-900 dark:text-white text-base">Prior Probability (Априорная вероятность)</dt>
+                        <dd class="mt-1 text-sm text-gray-600 dark:text-gray-400 font-serif">The initial probability of an event before taking into account new observational evidence or features.</dd>
+                    </div>
+                </dl>
+            </section>
+
         </div>
     </main>
 
@@ -264,6 +331,7 @@
                 <li><a href="#sec-loss" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">5. Loss functions</a></li>
                 <li><a href="#sec-linear" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">6. Linear Regression</a></li>
                 <li><a href="#sec-logistic" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">7. Logistic Regression</a></li>
+                <li><a href="#sec-glossary" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">8. Glossary & Terms</a></li>
             </ul>
         </nav>
 
