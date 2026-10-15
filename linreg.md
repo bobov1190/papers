@@ -1,4 +1,4 @@
-# The start of ML and Linear Models
+# The Start of ML and Linear Models
 
 
 Hi everybody
