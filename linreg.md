@@ -18,4 +18,6 @@ So let's start from agenda of this big introduction topic:
 
 So let's start from the roots of our models. How they have been created and etc. There is also one more really interesting question: how a model can learn the pattern of data and predict some info from it? And the answer is actually simple: Likelihood.
 
-So imagine that we have some data and we have have target element to predict. So firstly, we are going talk about only tabular datasets
+So imagine that we have some data and we have have target element to predict. So firstly, we are going talk about only tabular datasets. So let's say that we can predict either numbers or classes.
+
+
