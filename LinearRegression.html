@@ -72,20 +72,15 @@
             scrollbar-width: none;
         }
 
-        /* Мягкие микро-анимации появления контента */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Плавное появление секций при скролле */
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
-        .animate-fade-in {
-            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .reveal-section.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* Плавные переходы для интерактивных элементов */
@@ -99,8 +94,8 @@
     <!-- Main Article Container -->
     <main class="max-w-2xl mx-auto px-5 sm:px-6 py-16 sm:py-28 min-h-[200vh] w-full">
         
-        <!-- Header (Вернули большой солидный размер) -->
-        <header class="mb-16 sm:mb-24 animate-fade-in">
+        <!-- Header -->
+        <header class="mb-16 sm:mb-24 reveal-section">
             <h1 class="font-sans text-3xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-gray-100 leading-tight">The Start of ML and Linear Models</h1>
             <p class="font-sans text-lg sm:text-xl text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
                 Hi everybody! Today we are going to go through topics like Linear Regression, Logistic Regression, Likelihood, Loss Functions, Gradient Descent, Adam Optimizer, Softmax Regression, Simple NN and more.
@@ -111,7 +106,7 @@
         <div class="space-y-16 sm:space-y-24 w-full">
             
             <!-- Agenda -->
-            <section id="sec-agenda" class="scroll-mt-28 animate-fade-in">
+            <section id="sec-agenda" class="scroll-mt-28 reveal-section">
                 <h2 class="font-sans text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Agenda of this Big Introduction Topic</h2>
                 <ol class="font-sans list-decimal pl-5 space-y-2.5 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
                     <li><a href="#sec-likelihood" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Data and Likelihood</a></li>
@@ -126,7 +121,7 @@
             </section>
 
             <!-- Section 1 -->
-            <section id="sec-likelihood" class="scroll-mt-28 w-full animate-fade-in">
+            <section id="sec-likelihood" class="scroll-mt-28 w-full reveal-section">
                 <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 01</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Data and Likelihood</h2>
                 
@@ -169,7 +164,7 @@
             </section>
 
             <!-- Section 2 -->
-            <section id="sec-log-likelihood" class="scroll-mt-28 w-full animate-fade-in">
+            <section id="sec-log-likelihood" class="scroll-mt-28 w-full reveal-section">
                 <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 02</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Log Negative Likelihood</h2>
                 <p class="mb-6">
@@ -199,8 +194,8 @@
             </section>
 
             <!-- Section 3 -->
-            <section id="sec-optimizer" class="scroll-mt-28 w-full animate-fade-in">
-                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 03</span>
+            <section id="sec-optimizer" class="scroll-mt-28 w-full reveal-section">
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 03</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Optimizer & Gradient Descent</h2>
                 <p class="mb-6">
                     Optimizers like Gradient Descent and Adam help us iteratively update our model weights to minimize the loss function and find the optimal parameters.
@@ -227,7 +222,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </summary>
-                    <div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300 animate-fade-in">
+                    <div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300">
                         <p>To find the minimum of our loss function $J(w)$, we compute the partial derivative with respect to weights $w$:</p>
                         <div class="overflow-x-auto py-2 no-scrollbar text-gray-900 dark:text-gray-100">
                             $$\frac{\partial J}{\partial w} = -\frac{1}{N} \sum_{i=1}^{N} (y_i - x_i^T w) x_i$$
@@ -241,7 +236,7 @@
             </section>
 
             <!-- Section 4 -->
-            <section id="sec-models" class="scroll-mt-28 w-full animate-fade-in">
+            <section id="sec-models" class="scroll-mt-28 w-full reveal-section">
                 <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 04</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Model Families & Comparison</h2>
                 <p class="mb-6">
@@ -280,7 +275,7 @@
             </section>
 
             <!-- Section 5 -->
-            <section id="sec-loss" class="scroll-mt-28 w-full animate-fade-in">
+            <section id="sec-loss" class="scroll-mt-28 w-full reveal-section">
                 <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 05</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Loss Functions</h2>
                 <p class="mb-6">
@@ -289,7 +284,7 @@
             </section>
 
             <!-- Section 6 -->
-            <section id="sec-linear" class="scroll-mt-28 w-full animate-fade-in">
+            <section id="sec-linear" class="scroll-mt-28 w-full reveal-section">
                 <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 06</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Linear Regression Explained Fully</h2>
                 <p class="mb-6">
@@ -298,7 +293,7 @@
             </section>
 
             <!-- Section 7 -->
-            <section id="sec-logistic" class="scroll-mt-28 w-full animate-fade-in">
+            <section id="sec-logistic" class="scroll-mt-28 w-full reveal-section">
                 <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 07</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Logistic Regression Explained Fully</h2>
                 <p class="mb-6">
@@ -307,7 +302,7 @@
             </section>
 
             <!-- Section 8 -->
-            <section id="sec-glossary" class="scroll-mt-28 w-full animate-fade-in">
+            <section id="sec-glossary" class="scroll-mt-28 w-full reveal-section">
                 <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Reference</span>
                 <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Glossary & Terminology</h2>
                 
@@ -447,14 +442,32 @@
         window.addEventListener('scroll', updateProgress);
         window.addEventListener('resize', updateProgress);
 
-        // 4. IntersectionObserver for Active Section Highlighting
-        const observerOptions = {
+        // 4. Scroll Reveal Observer for Sections (Fade-In-Up)
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            root: null,
+            rootMargin: '0px 0px -10% 0px',
+            threshold: 0.1
+        });
+
+        document.querySelectorAll('.reveal-section').forEach(section => {
+            revealObserver.observe(section);
+        });
+
+        // 5. IntersectionObserver for Active Section Highlighting in Menu
+        const menuObserverOptions = {
             root: null,
             rootMargin: '-20% 0px -60% 0px',
             threshold: 0
         };
 
-        const observer = new IntersectionObserver((entries) => {
+        const menuObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const id = entry.target.getAttribute('id');
@@ -467,10 +480,10 @@
                     });
                 }
             });
-        }, observerOptions);
+        }, menuObserverOptions);
 
         document.querySelectorAll('section[id]').forEach((section) => {
-            observer.observe(section);
+            menuObserver.observe(section);
         });
     </script>
 </body>
