@@ -16,4 +16,4 @@ So let's start from agenda of this big introduction topic:
 
 ## Data and Likelihood
 
-
+So let's start from the roots of our models. How they have been created and etc. There is also one more really interesting question: how a model can learn the pattern of data and predict some info from it? And the answer is actually simple: Likelihood.
