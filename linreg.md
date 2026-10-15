@@ -1,4 +1,4 @@
-# Linear and Logistic Regression
+# The start of ML and Linear Models
 
 
 Hi everybody
