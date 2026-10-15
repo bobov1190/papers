@@ -14,4 +14,6 @@ So let's start from agenda of this big introduction topic:
 7. Logistic Regression Explained fully
 
 
+## Data and Likelihood
+
 
