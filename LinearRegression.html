@@ -17,7 +17,7 @@
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        dark: '#0f0f0f',
+                        dark: '#121212',
                         darkCard: '#1a1a1a',
                     }
                 }
@@ -28,7 +28,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/128/2541/2541979.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     
     <!-- MathJax Configuration for Inline $...$ support -->
     <script>
@@ -81,26 +81,26 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-dark text-gray-900 dark:text-gray-100 font-serif text-lg leading-relaxed antialiased transition-colors duration-300 selection:bg-gray-300 dark:selection:bg-gray-700 selection:text-black dark:selection:text-white">
+<body class="bg-[#fcfcfc] dark:bg-[#111111] text-gray-700 dark:text-gray-300 font-serif text-[1.05rem] leading-[1.8] antialiased transition-colors duration-300 selection:bg-gray-200 dark:selection:bg-gray-800">
 
     <!-- Main Article Container -->
-    <main class="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-24 min-h-[200vh] w-full">
+    <main class="max-w-2xl mx-auto px-5 sm:px-6 py-16 sm:py-28 min-h-[200vh] w-full">
         
         <!-- Header -->
-        <header class="mb-12 sm:mb-16">
-            <h1 class="font-sans text-3xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-white break-words">The Start of ML and Linear Models</h1>
-            <p class="font-sans text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+        <header class="mb-16 sm:mb-20">
+            <h1 class="font-sans text-3xl sm:text-4xl font-semibold tracking-tight mb-6 text-gray-900 dark:text-gray-100 leading-tight">The Start of ML and Linear Models</h1>
+            <p class="font-sans text-base sm:text-lg text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
                 Hi everybody! Today we are going to go through topics like Linear Regression, Logistic Regression, Likelihood, Loss Functions, Gradient Descent, Adam Optimizer, Softmax Regression, Simple NN and more.
             </p>
         </header>
 
         <!-- Article Content / Sections -->
-        <div class="space-y-16 sm:space-y-24 w-full">
+        <div class="space-y-16 sm:space-y-20 w-full">
             
             <!-- Agenda -->
             <section id="sec-agenda" class="scroll-mt-28">
-                <h2 class="font-sans text-2xl font-bold mb-4 text-gray-900 dark:text-white">Agenda of this Big Introduction Topic</h2>
-                <ol class="font-sans list-decimal pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+                <h2 class="font-sans text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Agenda of this Big Introduction Topic</h2>
+                <ol class="font-sans list-decimal pl-5 space-y-2 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
                     <li>Data and Likelihood</li>
                     <li>Log Negative Likelihood</li>
                     <li>Optimizer & Gradient</li>
@@ -114,16 +114,16 @@
 
             <!-- Section 1 -->
             <section id="sec-likelihood" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Chapter 01</span>
-                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Data and Likelihood</h2>
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 01</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Data and Likelihood</h2>
                 
                 <p class="mb-6">
                     So let's start from the roots of our models, how they have been created, and etc. There is also one more really interesting question: <em>how a model can learn the pattern of data and predict some info from it?</em> And the answer is actually simple: <strong>Likelihood</strong>.
                 </p>
 
                 <!-- Minimalist Note -->
-                <div class="my-6 pl-4 border-l-2 border-gray-400 dark:border-gray-600 font-sans text-base text-gray-600 dark:text-gray-400 italic">
-                    <span class="font-semibold text-gray-900 dark:text-white not-italic">Intuition Check:</span> Tabular data maps features matrix $X$ to target vector $y$. Think of features as columns and instances as rows.
+                <div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> Tabular data maps features matrix $X$ to target vector $y$. Think of features as columns and instances as rows.
                 </div>
 
                 <p class="mb-6">
@@ -136,16 +136,16 @@
                         <img 
                             src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Linear_regression.svg/800px-Linear_regression.svg.png" 
                             alt="Linear Regression Data Fit" 
-                            class="w-full max-w-[460px] h-auto rounded-lg opacity-90 dark:opacity-80 transition-opacity"
+                            class="w-full max-w-[440px] h-auto rounded opacity-85 dark:opacity-75 transition-opacity"
                         >
                     </div>
-                    <figcaption class="mt-3 text-center font-sans text-xs text-gray-500">
+                    <figcaption class="mt-3 text-center font-sans text-xs text-gray-400 dark:text-gray-500">
                         Figure 1.1 — Mapping data observations to parameter space via Likelihood estimation.
                     </figcaption>
                 </figure>
 
                 <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
-                    <div class="text-center text-sm sm:text-base max-w-full">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
                         $$\mathcal{L}(w \mid X, y) = P(y, X \mid w) = \arg\max_{w} P(y \mid X, w)$$
                     </div>
                 </div>
@@ -157,70 +157,70 @@
 
             <!-- Section 2 -->
             <section id="sec-log-likelihood" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 02</span>
-                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Log Negative Likelihood</h2>
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 02</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Log Negative Likelihood</h2>
                 <p class="mb-6">
                     Working with products of probabilities can lead to numerical underflow. To prevent this, we apply the logarithm, turning multiplication into summation and making optimization stable.
                 </p>
                 
-                <!-- Google Colab Link (Valid Icon) -->
+                <!-- Google Colab Link -->
                 <div class="my-3 flex items-center gap-2 font-sans text-xs">
-                    <a href="https://colab.research.google.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-                        <svg class="w-3.5 h-3.5 text-amber-500 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                    <a href="https://colab.research.google.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+                        <svg class="w-3.5 h-3.5 text-amber-500/90 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M16.5 3H7.5C5.01 3 3 5.01 3 7.5v9C3 18.99 5.01 21 7.5 21h9c2.49 0 4.5-2.01 4.5-4.5v-9C21 5.01 18.99 3 16.5 3zM12 17.25c-2.9 0-5.25-2.35-5.25-5.25S9.1,6.75,12,6.75s5.25,2.35,5.25,5.25S14.9,17.25,12,17.25z"/>
                         </svg>
                         <span>Open implementation in Google Colab</span>
                     </a>
                 </div>
 
-                <!-- Flat Code Block -->
-                <div class="my-4 rounded-xl bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-mono text-sm overflow-x-auto no-scrollbar border border-gray-200 dark:border-gray-800 p-5 transition-colors duration-300">
-                    <pre class="leading-relaxed"><code><span class="text-purple-600 dark:text-purple-400 font-semibold">import</span> numpy <span class="text-purple-600 dark:text-purple-400 font-semibold">as</span> np
+                <!-- Ultra-Clean Flat Code Block -->
+                <div class="my-4 rounded-lg bg-gray-100/70 dark:bg-gray-900/40 text-gray-800 dark:text-gray-200 font-mono text-[0.9rem] overflow-x-auto no-scrollbar border border-gray-200/50 dark:border-gray-800/40 p-5 transition-colors duration-300">
+                    <pre class="leading-relaxed"><code><span class="text-purple-600 dark:text-purple-400">import</span> numpy <span class="text-purple-600 dark:text-purple-400">as</span> np
 
-<span class="text-purple-600 dark:text-purple-400 font-semibold">def</span> <span class="text-blue-600 dark:text-blue-400 font-medium">negative_log_likelihood</span>(y_true, y_pred):
+<span class="text-purple-600 dark:text-purple-400">def</span> <span class="text-blue-600 dark:text-blue-400">negative_log_likelihood</span>(y_true, y_pred):
     eps = <span class="text-orange-600 dark:text-orange-400">1e-15</span>
     y_pred = np.clip(y_pred, eps, <span class="text-orange-600 dark:text-orange-400">1</span> - eps)
     nll = -np.sum(y_true * np.log(y_pred) + (<span class="text-orange-600 dark:text-orange-400">1</span> - y_true) * np.log(<span class="text-orange-600 dark:text-orange-400">1</span> - y_pred))
-    <span class="text-purple-600 dark:text-purple-400 font-semibold">return</span> nll</code></pre>
+    <span class="text-purple-600 dark:text-purple-400">return</span> nll</code></pre>
                 </div>
             </section>
 
             <!-- Section 3 -->
             <section id="sec-optimizer" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 03</span>
-                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Optimizer & Gradient Descent</h2>
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 03</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Optimizer & Gradient Descent</h2>
                 <p class="mb-6">
                     Optimizers like Gradient Descent and Adam help us iteratively update our model weights to minimize the loss function and find the optimal parameters.
                 </p>
 
                 <!-- Common Pitfall Block -->
-                <div class="my-6 pl-4 border-l-2 border-amber-500/80 font-sans text-base text-gray-600 dark:text-gray-400 italic">
-                    <span class="font-semibold text-gray-900 dark:text-white not-italic">Common Pitfall:</span> Failing to standardize feature scales before applying gradient descent causes loss contours to elongate, leading to wild oscillations and convergence failure.
+                <div class="my-6 pl-4 border-l border-amber-500/60 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Common Pitfall:</span> Failing to standardize feature scales before applying gradient descent causes loss contours to elongate, leading to wild oscillations and convergence failure.
                 </div>
 
                 <!-- Minimalist Text Link -->
-                <div class="my-6 font-sans">
-                    <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium hover:underline underline-offset-4 transition-all">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div class="my-6 font-sans text-sm">
+                    <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <span>Watch Video Lecture: Gradient Descent Intuition & Step-by-Step</span>
                     </a>
                 </div>
 
                 <!-- Minimalist Accordion -->
-                <details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800 font-sans transition-colors">
-                    <summary class="cursor-pointer font-semibold text-gray-900 dark:text-white flex items-center justify-between select-none group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                <details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors">
+                    <summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base">
                         <span>Mathematical Derivation & Gradient Update Rules</span>
-                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </summary>
                     <div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300">
                         <p>To find the minimum of our loss function $J(w)$, we compute the partial derivative with respect to weights $w$:</p>
-                        <div class="overflow-x-auto py-2 no-scrollbar">
+                        <div class="overflow-x-auto py-2 no-scrollbar text-gray-900 dark:text-gray-100">
                             $$\frac{\partial J}{\partial w} = -\frac{1}{N} \sum_{i=1}^{N} (y_i - x_i^T w) x_i$$
                         </div>
                         <p>Then we apply the iterative update rule with learning rate $\alpha$:</p>
-                        <div class="overflow-x-auto py-2 no-scrollbar">
+                        <div class="overflow-x-auto py-2 no-scrollbar text-gray-900 dark:text-gray-100">
                             $$w^{(t+1)} = w^{(t)} - \alpha \frac{\partial J}{\partial w}$$
                         </div>
                     </div>
@@ -229,17 +229,17 @@
 
             <!-- Section 4 -->
             <section id="sec-models" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 04</span>
-                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Model Families & Comparison</h2>
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 04</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Model Families & Comparison</h2>
                 <p class="mb-6">
                     Linear models form the cornerstone of machine learning. They are interpretable, fast to train, and serve as the foundation for deep neural networks.
                 </p>
 
                 <!-- Comparison Table -->
-                <div class="my-8 overflow-x-auto no-scrollbar font-sans">
-                    <table class="w-full text-left text-sm border-collapse">
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white font-semibold">
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
                                 <th class="py-3 pr-4">Property</th>
                                 <th class="py-3 px-4">Linear Regression</th>
                                 <th class="py-3 pl-4">Logistic Regression</th>
@@ -247,17 +247,17 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
                             <tr>
-                                <td class="py-3 pr-4 font-medium text-gray-900 dark:text-white">Task Type</td>
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Task Type</td>
                                 <td class="py-3 px-4">Regression (Continuous)</td>
                                 <td class="py-3 pl-4">Classification (Binary)</td>
                             </tr>
                             <tr>
-                                <td class="py-3 pr-4 font-medium text-gray-900 dark:text-white">Output Range</td>
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Output Range</td>
                                 <td class="py-3 px-4">$(-\infty, +\infty)$</td>
                                 <td class="py-3 pl-4">$(0, 1)$ via Sigmoid</td>
                             </tr>
                             <tr>
-                                <td class="py-3 pr-4 font-medium text-gray-900 dark:text-white">Loss Function</td>
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Loss Function</td>
                                 <td class="py-3 px-4">Mean Squared Error (MSE)</td>
                                 <td class="py-3 pl-4">Binary Cross-Entropy</td>
                             </tr>
@@ -268,8 +268,8 @@
 
             <!-- Section 5 -->
             <section id="sec-loss" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 05</span>
-                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Loss Functions</h2>
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 05</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Loss Functions</h2>
                 <p class="mb-6">
                     Different tasks require different loss metrics, such as Mean Squared Error (MSE) for regression and Cross-Entropy for classification.
                 </p>
@@ -277,8 +277,8 @@
 
             <!-- Section 6 -->
             <section id="sec-linear" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 06</span>
-                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Linear Regression Explained Fully</h2>
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 06</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Linear Regression Explained Fully</h2>
                 <p class="mb-6">
                     Linear regression models the relationship between a continuous target variable and one or more explanatory features using a linear equation.
                 </p>
@@ -286,8 +286,8 @@
 
             <!-- Section 7 -->
             <section id="sec-logistic" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Chapter 07</span>
-                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Logistic Regression Explained Fully</h2>
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Chapter 07</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Logistic Regression Explained Fully</h2>
                 <p class="mb-6">
                     Logistic regression applies the sigmoid function to map predicted values into probabilities, solving binary classification problems effectively.
                 </p>
@@ -295,21 +295,21 @@
 
             <!-- Section 8 -->
             <section id="sec-glossary" class="scroll-mt-28 w-full">
-                <span class="font-sans text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Reference</span>
-                <h2 class="font-sans text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white break-words">Glossary & Terminology</h2>
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-3">Reference</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Glossary & Terminology</h2>
                 
                 <dl class="space-y-6 font-sans">
                     <div>
-                        <dt class="font-semibold text-gray-900 dark:text-white text-base">Loss Function (Функция потерь)</dt>
-                        <dd class="mt-1 text-sm text-gray-600 dark:text-gray-400 font-serif">A method of quantifying how well a model aligns with the training data by mapping predictions to a scalar cost value.</dd>
+                        <dt class="font-medium text-gray-800 dark:text-gray-200 text-base">Loss Function (Функция потерь)</dt>
+                        <dd class="mt-1 text-sm text-gray-500 dark:text-gray-400 font-serif">A method of quantifying how well a model aligns with the training data by mapping predictions to a scalar cost value.</dd>
                     </div>
                     <div>
-                        <dt class="font-semibold text-gray-900 dark:text-white text-base">Regularization (Регуляризация)</dt>
-                        <dd class="mt-1 text-sm text-gray-600 dark:text-gray-400 font-serif">A technique used to prevent overfitting by adding a penalty term to the loss function based on model weight magnitudes.</dd>
+                        <dt class="font-medium text-gray-800 dark:text-gray-200 text-base">Regularization (Регуляризация)</dt>
+                        <dd class="mt-1 text-sm text-gray-500 dark:text-gray-400 font-serif">A technique used to prevent overfitting by adding a penalty term to the loss function based on model weight magnitudes.</dd>
                     </div>
                     <div>
-                        <dt class="font-semibold text-gray-900 dark:text-white text-base">Prior Probability (Априорная вероятность)</dt>
-                        <dd class="mt-1 text-sm text-gray-600 dark:text-gray-400 font-serif">The initial probability of an event before taking into account new observational evidence or features.</dd>
+                        <dt class="font-medium text-gray-800 dark:text-gray-200 text-base">Prior Probability (Априорная вероятность)</dt>
+                        <dd class="mt-1 text-sm text-gray-500 dark:text-gray-400 font-serif">The initial probability of an event before taking into account new observational evidence or features.</dd>
                     </div>
                 </dl>
             </section>
@@ -321,22 +321,22 @@
     <div class="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 font-sans max-w-[calc(100vw-2rem)]">
         
         <!-- Dropdown Menu -->
-        <nav id="menuList" class="absolute bottom-full left-0 mb-3 w-[280px] max-w-[calc(100vw-2rem)] max-h-[50vh] overflow-y-auto bg-white dark:bg-darkCard backdrop-blur-md text-gray-800 dark:text-gray-200 rounded-2xl p-2 transition-all duration-300 ease-out opacity-0 translate-y-2 scale-95 pointer-events-none shadow-2xl border border-gray-200 dark:border-gray-800">
-            <ul class="flex flex-col space-y-1 text-sm font-medium">
-                <li><a href="#sec-agenda" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">Agenda</a></li>
-                <li><a href="#sec-likelihood" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">1. Data and Likelihood</a></li>
-                <li><a href="#sec-log-likelihood" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">2. Log Negative Likelihood</a></li>
-                <li><a href="#sec-optimizer" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">3. Optimizer & Gradient</a></li>
-                <li><a href="#sec-models" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">4. Model Families</a></li>
-                <li><a href="#sec-loss" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">5. Loss functions</a></li>
-                <li><a href="#sec-linear" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">6. Linear Regression</a></li>
-                <li><a href="#sec-logistic" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">7. Logistic Regression</a></li>
-                <li><a href="#sec-glossary" class="menu-link block px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">8. Glossary & Terms</a></li>
+        <nav id="menuList" class="absolute bottom-full left-0 mb-3 w-[280px] max-w-[calc(100vw-2rem)] max-h-[50vh] overflow-y-auto bg-white/95 dark:bg-darkCard/95 backdrop-blur-md text-gray-700 dark:text-gray-300 rounded-xl p-2 transition-all duration-300 ease-out opacity-0 translate-y-2 scale-95 pointer-events-none shadow-2xl border border-gray-200/60 dark:border-gray-800/80">
+            <ul class="flex flex-col space-y-1 text-sm font-normal">
+                <li><a href="#sec-agenda" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">Agenda</a></li>
+                <li><a href="#sec-likelihood" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">1. Data and Likelihood</a></li>
+                <li><a href="#sec-log-likelihood" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">2. Log Negative Likelihood</a></li>
+                <li><a href="#sec-optimizer" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">3. Optimizer & Gradient</a></li>
+                <li><a href="#sec-models" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">4. Model Families</a></li>
+                <li><a href="#sec-loss" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">5. Loss functions</a></li>
+                <li><a href="#sec-linear" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">6. Linear Regression</a></li>
+                <li><a href="#sec-logistic" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">7. Logistic Regression</a></li>
+                <li><a href="#sec-glossary" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">8. Glossary & Terms</a></li>
             </ul>
         </nav>
 
         <!-- Control Bar -->
-        <div id="controlBar" class="bg-white dark:bg-darkCard text-gray-900 dark:text-white rounded-full px-4 sm:px-5 py-2.5 sm:py-3 shadow-2xl flex items-center gap-3 sm:gap-4 cursor-pointer hover:scale-[1.02] transition-transform duration-200 select-none border border-gray-200 dark:border-gray-800">
+        <div id="controlBar" class="bg-white/90 dark:bg-darkCard/90 backdrop-blur-md text-gray-800 dark:text-gray-200 rounded-full px-4 sm:px-5 py-2.5 sm:py-3 shadow-2xl flex items-center gap-3 sm:gap-4 cursor-pointer hover:scale-[1.02] transition-transform duration-200 select-none border border-gray-200/60 dark:border-gray-800/80">
             
             <!-- Index Toggle Button -->
             <button id="indexBtn" class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium focus:outline-none">
@@ -349,17 +349,17 @@
                 </svg>
             </button>
 
-            <div class="w-px h-3.5 bg-gray-300 dark:bg-white/20"></div>
+            <div class="w-px h-3.5 bg-gray-200 dark:bg-white/20"></div>
 
             <!-- Dark Mode Toggle Button -->
-            <button id="themeToggle" class="p-1 hover:text-gray-600 dark:hover:text-gray-300 transition-colors focus:outline-none" title="Toggle Theme">
+            <button id="themeToggle" class="p-1 hover:text-gray-900 dark:hover:text-white transition-colors focus:outline-none" title="Toggle Theme">
                 <!-- Sun Icon -->
-                <svg id="sunIcon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg id="sunIcon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 <!-- Moon Icon -->
-                <svg id="moonIcon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                <svg id="moonIcon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
             </button>
 
-            <div class="w-px h-3.5 bg-gray-300 dark:bg-white/20"></div>
+            <div class="w-px h-3.5 bg-gray-200 dark:bg-white/20"></div>
 
             <!-- Progress Display -->
             <div class="text-xs sm:text-sm font-medium tabular-nums min-w-[3ch] text-right" id="progressDisplay">
@@ -447,9 +447,9 @@
                     const id = entry.target.getAttribute('id');
                     links.forEach(link => {
                         if (link.getAttribute('href') === `#${id}`) {
-                            link.classList.add('bg-gray-100', 'dark:bg-white/10', 'font-semibold', 'text-black', 'dark:text-white');
+                            link.classList.add('bg-gray-100', 'dark:bg-white/10', 'font-medium', 'text-gray-900', 'dark:text-white');
                         } else {
-                            link.classList.remove('bg-gray-100', 'dark:bg-white/10', 'font-semibold', 'text-black', 'dark:text-white');
+                            link.classList.remove('bg-gray-100', 'dark:bg-white/10', 'font-medium', 'text-gray-900', 'dark:text-white');
                         }
                     });
                 }
