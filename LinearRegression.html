@@ -1,12 +1,271 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>My Playground</title>
-        <link rel="stylesheet" href="styles.css" />
-        <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/128/2541/2541979.png">
-    </head>
-    <body>
-        <h1>Hello, world!</h1>
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Start of ML and Linear Models</title>
+    <!-- Google Fonts: Inter for headings/UI, Charter/Merriweather style for reading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/128/2541/2541979.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #292929;
+            --text-secondary: #757575;
+            --accent-color: #1a8917;
+            --border-color: #e6e6e6;
+            --code-bg: #f7f7f7;
+            --quote-border: #292929;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Lora', Georgia, serif;
+            font-size: 20px;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Medium-style Navigation Bar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border-color);
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: -0.5px;
+            color: #000;
+            text-decoration: none;
+        }
+
+        .nav-badge {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            background: #f2f2f2;
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: var(--text-secondary);
+        }
+
+        /* Main Article Container */
+        article {
+            max-width: 680px;
+            margin: 60px auto 120px auto;
+            padding: 0 20px;
+        }
+
+        /* Article Header */
+        .article-header {
+            margin-bottom: 40px;
+        }
+
+        h1.article-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -1.2px;
+            margin-bottom: 20px;
+            color: #191919;
+        }
+
+        .author-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 24px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .author-info h4 {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #191919;
+        }
+
+        .author-info p {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Typography & Content Styles */
+        p {
+            margin-bottom: 28px;
+        }
+
+        h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 48px;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            color: #191919;
+        }
+
+        h3 {
+            font-family: 'Inter', sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            color: #191919;
+        }
+
+        /* Lists */
+        ol, ul {
+            margin-bottom: 28px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            padding-left: 6px;
+        }
+
+        li::marker {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Code & Formulas */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #c7254e;
+        }
+
+        .formula-box {
+            background: var(--code-bg);
+            border-left: 4px solid var(--accent-color);
+            padding: 20px 24px;
+            margin: 32px 0;
+            border-radius: 0 8px 8px 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            overflow-x: auto;
+            color: #111;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        /* Callout / Paragraph Highlight */
+        .intro-lead {
+            font-size: 22px;
+            line-height: 1.6;
+            color: #404040;
+            margin-bottom: 36px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 16px 20px;
+            }
+            h1.article-title {
+                font-size: 32px;
+            }
+            body {
+                font-size: 18px;
+            }
+            article {
+                margin-top: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Medium Nav -->
+    <nav>
+        <a href="#" class="nav-brand">Medium</a>
+        <div class="nav-badge">Draft</div>
+    </nav>
+
+    <!-- Article Content -->
+    <article>
+        <div class="article-header">
+            <h1 class="article-title">The Start of ML and Linear Models</h1>
+            <div class="author-meta">
+                <div class="author-avatar">B</div>
+                <div class="author-info">
+                    <h4>Bahodir</h4>
+                    <p>Published in Machine Learning Lab • 4 min read</p>
+                </div>
+            </div>
+        </div>
+
+        <p class="intro-lead">Hi everybody! Today we are going to go through topics like Linear Regression and Logistic Regression. And that is not the only thing, but also it is about Likelihood, Loss Functions, Gradient Descent Optimizer, Adam Optimizer, Softmax Regression, Simple NN and so on. So as you can see, it is a really huge topic to talk about because it gathers the first beginner's ideas and solves fundamental questions.</p>
+
+        <h2>Agenda of this Big Introduction Topic</h2>
+        <ol>
+            <li>Data and Likelihood</li>
+            <li>Log Negative Likelihood</li>
+            <li>Optimizer</li>
+            <li>Model Families: Linear models and some Classification models</li>
+            <li>Loss functions and difference between each of them</li>
+            <li>Linear Regression Explained fully</li>
+            <li>Logistic Regression Explained fully</li>
+        </ol>
+
+        <h2>Data and Likelihood</h2>
+        <p>So let's start from the roots of our models, how they have been created, and etc. There is also one more really interesting question: <em>how a model can learn the pattern of data and predict some info from it?</em> And the answer is actually simple: <strong>Likelihood</strong>.</p>
+
+        <p>Imagine that we have some data and we have a target element to predict. Firstly, we are going to talk only about tabular datasets. So let's say that we can predict either numbers or classes.</p>
+
+        <p>The example with the number can be the temperature prediction made on wind speed and humidity and etc. An example with the class can be within spam/not spam problem in your email or Telegram.</p>
+
+        <p>So actually we have got the idea that we have data. Okay, now we need to define a model with which we are going to predict our approximate answer. Why is it approximate? The right answer would be because we are humans, so we cannot make a system which is going to make the absolute rightest predictions. But there are also some actually grounded explanations for it, which we are going to talk about later.</p>
+
+        <p>So in the system of approximate solution, data, and model, our main goal is to define the best possible model to predict as right as possible. And here we are going to observe the idea of likelihood.</p>
+
+        <div class="formula-box">
+            L(w | X, y) = P(y, X | w) = argmax w
+        </div>
+
+        <p>So what it is trying to say to us is that we need the best weights to predict the most approximate answer for our question.</p>
+    </article>
+
+</body>
 </html>
