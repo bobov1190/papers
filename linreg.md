@@ -22,4 +22,6 @@ So imagine that we have some data and we have have target element to predict. So
 
 The example with the number can be the temperature prediction made on wind speed and humidity and etc. And example with the class can be within spam/not spam problem in your email or tg.
 
+So actually we have got the idea that we have data. Okay, now we need to define a model with which we are going to predict our approximate answer. Why is it approximate? The right answer would be because we are humans. So we cannot make a system which is going to make the rightest predictions. But there are also some actually landed explanations for it, which we are going to talk later.
+
 
