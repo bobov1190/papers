@@ -24,4 +24,4 @@ The example with the number can be the temperature prediction made on wind speed
 
 So actually we have got the idea that we have data. Okay, now we need to define a model with which we are going to predict our approximate answer. Why is it approximate? The right answer would be because we are humans. So we cannot make a system which is going to make the rightest predictions. But there are also some actually landed explanations for it, which we are going to talk later.
 
-
+So in the system of approximate solution,data and model our main goal is to define the best possible model to predict as right as possible. And here we are going to observe the idea of likelihood.
