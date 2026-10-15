@@ -42,10 +42,10 @@
             position: relative;
         }
 
-        /* Кастомный кастомный вертикальный скроллбар */
+        /* Основной вертикальный скроллбар страницы */
         ::-webkit-scrollbar {
             width: 6px;
-            height: 0px; /* Скрываем любые горизонтальные скроллбары элементов */
+            height: 0px;
         }
         ::-webkit-scrollbar-track {
             background: transparent;
@@ -53,6 +53,15 @@
         ::-webkit-scrollbar-thumb {
             background-color: rgba(150,150,150,0.3);
             border-radius: 20px;
+        }
+
+        /* Полное скрытие скроллбара у выпадающего меню с сохранением прокрутки */
+        #menuList::-webkit-scrollbar {
+            display: none;
+        }
+        #menuList {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
 
         /* Скрытие скроллбара в формуле */
