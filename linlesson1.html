@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Linear and Logistic Regression: Lesson 1</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Lora', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        dark: '#121212',
+                        darkCard: '#1a1a1a',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/128/2541/2541979.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+    <!-- MathJax Configuration for Inline $...$ support -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* Полное устранение скроллбаров при сохранении плавной прокрутки */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Скрытие скроллбара у выпадающего меню */
+        #menuList::-webkit-scrollbar {
+            display: none;
+        }
+        #menuList {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Скрытие скроллбара в формулах и коде */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Плавное повторное появление секций при скролле */
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Плавная анимация раскрытия аккордеона без рывков */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .accordion-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            opacity: 0;
+        }
+        details[open] .accordion-content {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+        .accordion-content > div {
+            overflow: hidden;
+        }
+
+        /* Плавные переходы для интерактивных элементов */
+        a, button, tr, details {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Минималистичный слайдер для интерактивных виджетов */
+        input[type="range"].lesson-range {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 2px;
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 2px;
+            outline: none;
+        }
+        input[type="range"].lesson-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        input[type="range"].lesson-range::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+        input[type="range"].lesson-range::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border: 0;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-[#fcfcfc] dark:bg-[#111111] text-gray-700 dark:text-gray-300 font-serif text-[1.05rem] leading-[1.8] antialiased transition-colors duration-300 selection:bg-gray-200 dark:selection:bg-gray-800">
+
+    <!-- Main Article Container -->
+    <main class="max-w-2xl mx-auto px-5 sm:px-6 py-16 sm:py-28 min-h-[200vh] w-full">
+
+        <!-- Header -->
+        <header class="mb-16 sm:mb-24 reveal-section">
+            <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4 block">Lesson 01 · Turin Polytechnic University in Tashkent</span>
+            <h1 class="font-sans text-3xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-gray-100 leading-tight">Linear and Logistic Regression</h1>
+            <p class="font-sans text-lg sm:text-xl text-gray-500 dark:text-gray-400 font-normal leading-relaxed">
+                From a straight line to neural networks. We start with three dots and one number, and end with the idea that powers modern AI: a model, a loss, and a walk downhill.
+            </p>
+        </header>
+
+        <!-- Article Content / Sections -->
+        <div class="space-y-16 sm:space-y-24 w-full">
+
+            <!-- Agenda -->
+            <section id="sec-agenda" class="scroll-mt-28 reveal-section">
+                <h2 class="font-sans text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Agenda</h2>
+                <ol class="font-sans list-decimal pl-5 space-y-2.5 text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+                    <li><a href="#sec-kinds" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Two kinds of questions</a></li>
+                    <li><a href="#sec-model" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">A model with one knob</a></li>
+                    <li><a href="#sec-loss" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Loss: how wrong is the line?</a></li>
+                    <li><a href="#sec-descent" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Gradient descent: walking downhill</a></li>
+                    <li><a href="#sec-cars" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Real data: cars and two knobs</a></li>
+                    <li><a href="#sec-penguins" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Many features: penguins</a></li>
+                    <li><a href="#sec-logistic" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Logistic regression: yes or no</a></li>
+                    <li><a href="#sec-neurons" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">One neuron, then a network</a></li>
+                    <li><a href="#sec-recap" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">What we learned</a></li>
+                    <li><a href="#sec-glossary" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Glossary & terminology</a></li>
+                </ol>
+            </section>
+
+            <!-- Chapter 1 -->
+            <section id="sec-kinds" class="scroll-mt-28 w-full reveal-section">
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 01</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Two Kinds of Questions</h2>
+
+                <p class="mb-6">
+                    Machine learning answers questions about data. Almost every question is one of two kinds. In <strong>regression</strong> the answer is a <em>number</em>: how much fuel will a 1500 kg car use? In <strong>classification</strong> the answer is a <em>category</em>: is this penguin an Adelie or a Gentoo?
+                </p>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4"></th>
+                                <th class="py-3 px-4">Regression</th>
+                                <th class="py-3 pl-4">Classification</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Question</td>
+                                <td class="py-3 px-4">How much fuel will this car use?</td>
+                                <td class="py-3 pl-4">Which penguin is this?</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Input</td>
+                                <td class="py-3 px-4">Weight: 1500 kg</td>
+                                <td class="py-3 pl-4">Flipper: 215 mm</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Answer</td>
+                                <td class="py-3 px-4">A number (L / 100 km)</td>
+                                <td class="py-3 pl-4">A category (Adelie or Gentoo)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="mb-6">
+                    The way a machine learns is always the same. We have data $Z$. A <strong>learning algorithm</strong> looks at it and produces a <strong>model</strong> $f$. Later, a new input arrives, and the model gives a predicted output. Today we pick the simplest family of models there is: a <em>straight line</em>.
+                </p>
+
+                <div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> Think of a model as a vending machine. You put in an input, a prediction drops out. Learning means tuning the machine until the predictions are good.
+                </div>
+            </section>
+
+            <!-- Chapter 2 -->
+            <section id="sec-model" class="scroll-mt-28 w-full reveal-section">
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 02</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">A Model with One Knob</h2>
+
+                <p class="mb-6">
+                    Start tiny. We know three examples: $(1, 1)$, $(2, 2)$ and $(3, 3)$. Each is one dot: an input $x$ and its true answer $y$. A new input arrives, $x = 4$. What answer should we expect? To say anything, we need a model.
+                </p>
+
+                <p class="mb-6">
+                    Our machine is the simplest possible: it multiplies the input by a number $\beta$.
+                </p>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$\hat{y} = f_\beta(x) = \beta x$$
+                    </div>
+                </div>
+
+                <p class="mb-6">
+                    Here $\hat{y}$ ("y-hat") is the <em>prediction</em>: what the model says the answer is. The number $\beta$ is a knob we can turn. Try a guess, $\beta = 1.5$. Now the same machine gives different predictions for different inputs:
+                </p>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4">Input $x$</th>
+                                <th class="py-3 px-4">Machine</th>
+                                <th class="py-3 px-4">Prediction $\hat{y}$</th>
+                                <th class="py-3 pl-4">True $y$</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1</td>
+                                <td class="py-3 px-4">× 1.5</td>
+                                <td class="py-3 px-4">1.5</td>
+                                <td class="py-3 pl-4">1</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2</td>
+                                <td class="py-3 px-4">× 1.5</td>
+                                <td class="py-3 px-4">3</td>
+                                <td class="py-3 pl-4">2</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">3</td>
+                                <td class="py-3 px-4">× 1.5</td>
+                                <td class="py-3 px-4">4.5</td>
+                                <td class="py-3 pl-4">3</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="mb-6">
+                    Geometrically, the model is a <strong>line</strong> through the origin, and $\beta$ is its slope. To predict, pick $x$, go up to the line, and read the height. For $x = 2$ the line gives $\hat{y} = 3$, but reality is $y = 2$. The gap, $3 - 2 = 1$, is the <strong>error</strong>. A good $\beta$ makes the errors small. But how do we pick it?
+                </p>
+
+                <!-- Real Image from Wikimedia Commons -->
+                <figure class="my-8">
+                    <div class="flex flex-col items-center">
+                        <img
+                            src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Linear_regression%2C_rotating_coordinate_system.gif?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                            alt="Linear regression: a line fitted through data points"
+                            class="w-full max-w-[440px] h-auto rounded opacity-85 dark:opacity-75 transition-all duration-500 hover:opacity-100 hover:scale-[1.01]"
+                        >
+                    </div>
+                    <figcaption class="mt-3 text-center font-sans text-xs text-gray-400 dark:text-gray-500">
+                        Figure 2.1 — A line fitted through points. The slope is the knob we are going to turn.
+                    </figcaption>
+                </figure>
+            </section>
+
+            <!-- Chapter 3 -->
+            <section id="sec-loss" class="scroll-mt-28 w-full reveal-section">
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 03</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Loss: How Wrong Is the Line?</h2>
+
+                <p class="mb-6">
+                    For every example the error is the gap between prediction and reality, $y_i - \beta x_i$. We want one number that says how wrong the whole model is. Square each error (so that misses above and below do not cancel) and take the average. This is the <strong>mean squared error</strong> (MSE), our <strong>loss function</strong>:
+                </p>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$L(\beta; Z) = \frac{1}{n} \sum_{i=1}^{n} \left( y_i - \beta x_i \right)^2$$
+                    </div>
+                </div>
+
+                <p class="mb-6">
+                    It is computationally convenient and works well in practice. Now try different slopes on our three dots and compute the loss for each:
+                </p>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4">Slope $\beta$</th>
+                                <th class="py-3 px-4">Loss $L(\beta; Z)$</th>
+                                <th class="py-3 pl-4">Verdict</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">0.25</td>
+                                <td class="py-3 px-4">2.6</td>
+                                <td class="py-3 pl-4">line too flat</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">0.5</td>
+                                <td class="py-3 px-4">1.2</td>
+                                <td class="py-3 pl-4">better</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1</td>
+                                <td class="py-3 px-4">0</td>
+                                <td class="py-3 pl-4">the line passes through every dot</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1.5</td>
+                                <td class="py-3 px-4">1.2</td>
+                                <td class="py-3 pl-4">too steep, as bad as 0.5</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2</td>
+                                <td class="py-3 px-4">4.7</td>
+                                <td class="py-3 pl-4">much too steep</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="mb-6">
+                    Plot the loss against $\beta$ and it forms a <strong>bowl</strong>. The bottom of the bowl is the best line. Drag the slider below and watch the line, the red errors and the dot on the bowl move together.
+                </p>
+
+                <!-- Interactive widget A: the loss bowl -->
+                <figure class="my-8 font-sans" id="wA">
+                    <div class="flex items-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
+                        <label for="wA-beta" class="whitespace-nowrap">Slope $\beta$ = <span id="wA-bval" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">0.25</span></label>
+                        <input id="wA-beta" type="range" min="0" max="2.5" step="0.05" value="0.25" class="lesson-range">
+                    </div>
+                    <svg id="wA-svg" viewBox="0 0 640 250" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img" aria-label="Line fit on the left, loss bowl on the right"></svg>
+                    <div class="mt-2 text-sm text-gray-600 dark:text-gray-400 tabular-nums">Loss $L$ = <span id="wA-loss" class="font-medium text-gray-900 dark:text-gray-100">2.63</span></div>
+                    <figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">
+                        Figure 3.1 — Interactive. Left: the three dots, the line $\hat{y} = \beta x$ and the errors. Right: the loss as a function of $\beta$.
+                    </figcaption>
+                </figure>
+
+                <div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> A bowl has exactly one lowest point, and from any spot on its wall you can tell which way is down. That is the whole trick behind the next chapter.
+                </div>
+
+                <details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors">
+                    <summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base">
+                        <span>Why is the loss for our three dots exactly a bowl?</span>
+                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </summary>
+                    <div class="accordion-content">
+                        <div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300">
+                            <p>On our dots $y_i = x_i$, so each error is $y_i - \beta x_i = (1 - \beta) x_i$. Squaring and averaging gives:</p>
+                            <div class="overflow-x-auto py-2 no-scrollbar text-gray-900 dark:text-gray-100">
+                                $$L(\beta) = \frac{(1-\beta)^2}{3}\,(1^2 + 2^2 + 3^2) = \frac{14}{3}\,(1-\beta)^2$$
+                            </div>
+                            <p>A parabola with its bottom at $\beta = 1$. Check the table: $\beta = 0.25$ gives $\tfrac{14}{3} \cdot 0.5625 \approx 2.6$ and $\beta = 2$ gives $\tfrac{14}{3} \approx 4.7$.</p>
+                        </div>
+                    </div>
+                </details>
+
+                <details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors">
+                    <summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base">
+                        <span>Optional: why squared error? The likelihood view</span>
+                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </summary>
+                    <div class="accordion-content">
+                        <div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300">
+                            <p>Suppose reality is the line plus random noise, $y_i = \beta x_i + \varepsilon_i$, where the noise is Gaussian with variance $\sigma^2$. The likelihood of the data is the product of the probabilities of every $y_i$. Take the logarithm and flip the sign (the negative log-likelihood):</p>
+                            <div class="overflow-x-auto py-2 no-scrollbar text-gray-900 dark:text-gray-100">
+                                $$-\log p(y \mid X, \beta) = \frac{1}{2\sigma^2} \sum_{i=1}^{n} \left( y_i - \beta x_i \right)^2 + \text{const}$$
+                            </div>
+                            <p>Maximizing the likelihood is therefore the same as minimizing the squared errors. MSE is not an arbitrary choice: it is what "the best $\beta$ for the data" means when the noise is Gaussian.</p>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+            <!-- Chapter 4 -->
+            <section id="sec-descent" class="scroll-mt-28 w-full reveal-section">
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 04</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Gradient Descent: Walking Downhill</h2>
+
+                <p class="mb-6">
+                    We could try every $\beta$ by hand, but a computer can do better: stand on the bowl, feel which way is downhill, and take a step. Say we stand at $\beta = 0.25$. Nudge it a little, to $0.26$, and the loss drops from $2.63$ to $2.56$. The slope is about $-0.07 / 0.01 = -7.0$. A negative slope means the loss falls as $\beta$ grows, so the bottom is to the right.
+                </p>
+
+                <p class="mb-6">
+                    The rule is: <strong>walk against the slope</strong>. How far? The <strong>step size</strong> $\eta$ (also called the <em>learning rate</em>) decides.
+                </p>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$\beta \leftarrow \beta - \eta \cdot \text{slope}, \qquad \text{slope} = \frac{dL}{d\beta} = -\frac{2}{n} \sum_{i=1}^{n} x_i \left( y_i - \beta x_i \right)$$
+                    </div>
+                </div>
+
+                <p class="mb-6">
+                    Take $\eta = 0.1$ and start at $\beta = 0.25$. Each step uses the slope at the current spot:
+                </p>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4">Step</th>
+                                <th class="py-3 px-4">Slope at $\beta$</th>
+                                <th class="py-3 px-4">Update</th>
+                                <th class="py-3 pl-4">New $\beta$</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1</td>
+                                <td class="py-3 px-4">$-7.0$</td>
+                                <td class="py-3 px-4">$0.25 - 0.1 \times (-7.0)$</td>
+                                <td class="py-3 pl-4">0.95</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2</td>
+                                <td class="py-3 px-4">$-0.47$</td>
+                                <td class="py-3 px-4">$0.95 - 0.1 \times (-0.47)$</td>
+                                <td class="py-3 pl-4">0.997</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]">
+                                <td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">3</td>
+                                <td class="py-3 px-4">$\approx -0.03$</td>
+                                <td class="py-3 px-4">tiny step</td>
+                                <td class="py-3 pl-4">1.000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="mb-6">
+                    Notice how the steps shrink near the bottom: the ground gets flatter, so the slope, and therefore the step, gets smaller. The walk is $0.250 \to 0.950 \to 0.997 \to 1.000$.
+                </p>
+
+                <!-- Google Colab Link -->
+                <div class="my-3 flex items-center gap-2 font-sans text-xs">
+                    <a href="https://colab.research.google.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+                        <svg class="w-3.5 h-3.5 text-amber-500/90 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16.5 3H7.5C5.01 3 3 5.01 3 7.5v9C3 18.99 5.01 21 7.5 21h9c2.49 0 4.5-2.01 4.5-4.5v-9C21 5.01 18.99 3 16.5 3zM12 17.25c-2.9 0-5.25-2.35-5.25-5.25S9.1,6.75,12,6.75s5.25,2.35,5.25,5.25S14.9,17.25,12,17.25z"/>
+                        </svg>
+                        <span>Paste this into a new Google Colab notebook</span>
+                    </a>
+                </div>
+
+                <div class="my-4 rounded-lg bg-gray-100/70 dark:bg-gray-900/40 text-gray-800 dark:text-gray-200 font-mono text-[0.9rem] overflow-x-auto no-scrollbar border border-gray-200/50 dark:border-gray-800/40 p-5 transition-all duration-300 hover:border-gray-300 dark:hover:border-gray-700">
+                    <pre class="leading-relaxed"><code><span class="text-purple-600 dark:text-purple-400">import</span> numpy <span class="text-purple-600 dark:text-purple-400">as</span> np
+
+x = np.array([<span class="text-orange-600 dark:text-orange-400">1.</span>, <span class="text-orange-600 dark:text-orange-400">2.</span>, <span class="text-orange-600 dark:text-orange-400">3.</span>])
+y = np.array([<span class="text-orange-600 dark:text-orange-400">1.</span>, <span class="text-orange-600 dark:text-orange-400">2.</span>, <span class="text-orange-600 dark:text-orange-400">3.</span>])
+beta, eta = <span class="text-orange-600 dark:text-orange-400">0.25</span>, <span class="text-orange-600 dark:text-orange-400">0.1</span>
+
+<span class="text-purple-600 dark:text-purple-400">for</span> step <span class="text-purple-600 dark:text-purple-400">in</span> <span class="text-blue-600 dark:text-blue-400">range</span>(<span class="text-orange-600 dark:text-orange-400">1</span>, <span class="text-orange-600 dark:text-orange-400">4</span>):
+    slope = -<span class="text-orange-600 dark:text-orange-400">2</span> * np.mean(x * (y - beta * x))
+    beta = beta - eta * slope
+    <span class="text-blue-600 dark:text-blue-400">print</span>(step, <span class="text-blue-600 dark:text-blue-400">round</span>(slope, <span class="text-orange-600 dark:text-orange-400">2</span>), <span class="text-blue-600 dark:text-blue-400">round</span>(beta, <span class="text-orange-600 dark:text-orange-400">3</span>))
+
+<span class="text-gray-400 dark:text-gray-500"># 1 -7.0 0.95</span>
+<span class="text-gray-400 dark:text-gray-500"># 2 -0.47 0.997</span>
+<span class="text-gray-400 dark:text-gray-500"># 3 -0.03 1.0</span></code></pre>
+                </div>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The step size matters</h3>
+
+                <p class="mb-6">
+                    Too small a step is slow. Too big a step jumps over the bottom and bounces away. Choosing $\eta$ well is part of the craft. Try it yourself: set the step size, then press <em>Step</em> and watch $\beta$ and the loss.
+                </p>
+
+                <!-- Interactive widget B: gradient descent walker -->
+                <figure class="my-8 font-sans" id="wB">
+                    <div class="flex items-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
+                        <label for="wB-eta" class="whitespace-nowrap">Step size $\eta$ = <span id="wB-eval" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">0.10</span></label>
+                        <input id="wB-eta" type="range" min="0.01" max="0.35" step="0.01" value="0.10" class="lesson-range">
+                    </div>
+                    <svg id="wB-svg" viewBox="0 0 640 220" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img" aria-label="Loss bowl with the gradient descent path"></svg>
+                    <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
+                        <button id="wB-step" class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400">Step</button>
+                        <button id="wB-run" class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400">Run 20 steps</button>
+                        <button id="wB-reset" class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-500">Reset</button>
+                    </div>
+                    <div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wB-readout">step 0: β = 0.250, loss = 2.63</div>
+                    <figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">
+                        Figure 4.1 — Interactive. Small $\eta$ crawls, $\eta = 0.1$ lands on $\beta = 1$ in a few steps, and a large $\eta$ overshoots further each time.
+                    </figcaption>
+                </figure>
+
+                <div class="my-6 pl-4 border-l border-amber-500/60 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-amber-500">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Common Pitfall:</span> For our three dots every step multiplies the distance to the bottom by $1 - \tfrac{28}{3}\eta$. If $\eta > 0.21$ or so, this factor is below $-1$, so each step lands farther from $\beta = 1$ than the last one, and the loss grows instead of falling. This is what $\eta = 0.3$ does on the slide.
+                </div>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$\underbrace{\text{Model}}_{\hat{y} = \beta x} \;\to\; \underbrace{\text{Loss}}_{\text{MSE}} \;\to\; \underbrace{\text{Optimize}}_{\text{gradient descent}}$$
+                    </div>
+                </div>
+
+                <p class="mb-6">
+                    This is <strong>the recipe of machine learning</strong>: pick a model, measure how wrong it is with a loss, and find the knobs with the smallest loss. Linear regression, logistic regression and neural networks all follow it.
+                </p>
+            </section>
+
