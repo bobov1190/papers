@@ -284,14 +284,28 @@
                     Geometrically, the model is a <strong>line</strong> through the origin, and $\beta$ is its slope. To predict, pick $x$, go up to the line, and read the height. For $x = 2$ the line gives $\hat{y} = 3$, but reality is $y = 2$. The gap, $3 - 2 = 1$, is the <strong>error</strong>. A good $\beta$ makes the errors small. But how do we pick it?
                 </p>
 
-                <!-- Real Image from Wikimedia Commons -->
                 <figure class="my-8">
                     <div class="flex flex-col items-center">
-                        <img
-                            src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Linear_regression%2C_rotating_coordinate_system.gif?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
-                            alt="Linear regression: a line fitted through data points"
-                            class="w-full max-w-[440px] h-auto rounded opacity-85 dark:opacity-75 transition-all duration-500 hover:opacity-100 hover:scale-[1.01]"
-                        >
+                        <svg viewBox="0 0 440 300" class="w-full max-w-[440px] h-auto text-gray-500 dark:text-gray-400" role="img" aria-label="Three dots on the diagonal, a line with slope 1.5, and the error at x = 2">
+                            <path d="M86 20V260H420" fill="none" stroke="currentColor" stroke-width="1" opacity="0.6"/>
+                            <text x="82" y="16" text-anchor="end" font-size="13" fill="currentColor">y</text>
+                            <text x="420" y="282" text-anchor="end" font-size="13" fill="currentColor">x</text>
+                            <text x="158" y="278" text-anchor="middle" font-size="12" fill="currentColor">1</text>
+                            <text x="230" y="278" text-anchor="middle" font-size="12" fill="currentColor">2</text>
+                            <text x="302" y="278" text-anchor="middle" font-size="12" fill="currentColor">3</text>
+                            <line x1="86" y1="260" x2="338" y2="73.5" stroke="#10b981" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.8"/>
+                            <text x="342" y="76" font-size="12" fill="#10b981">best line, β = 1</text>
+                            <line x1="86" y1="260" x2="302" y2="20.2" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+                            <text x="308" y="26" font-size="12" fill="#f59e0b">our line, β = 1.5</text>
+                            <line x1="230" y1="153.3" x2="230" y2="100" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="158" cy="206.7" r="5.5" fill="#3b82f6"/>
+                            <circle cx="230" cy="153.3" r="5.5" fill="#3b82f6"/>
+                            <circle cx="302" cy="100" r="5.5" fill="#3b82f6"/>
+                            <circle cx="230" cy="100" r="5" fill="#f59e0b"/>
+                            <text x="214" y="96" text-anchor="end" font-size="13" fill="#f59e0b">ŷ = 3</text>
+                            <text x="214" y="160" text-anchor="end" font-size="13" fill="#3b82f6">y = 2</text>
+                            <text x="240" y="132" font-size="13" fill="#ef4444">error = 1</text>
+                        </svg>
                     </div>
                     <figcaption class="mt-3 text-center font-sans text-xs text-gray-400 dark:text-gray-500">
                         Figure 2.1 — A line fitted through points. The slope is the knob we are going to turn.
@@ -541,3 +555,872 @@ beta, eta = <span class="text-orange-600 dark:text-orange-400">0.25</span>, <spa
                 </p>
             </section>
 
+
+            <!-- Chapter 5 -->
+            <section id="sec-cars" class="scroll-mt-28 w-full reveal-section">
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 05</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Real Data: Cars and Two Knobs</h2>
+
+                <p class="mb-6">
+                    Three dots were a warm-up. Now real data: <strong>398 cars</strong> from the 1970s and 80s. Each dot is one car, with its weight in tonnes and its fuel use in litres per 100 km. Heavier cars burn more fuel, so a line should capture the trend. The question: a car weighs 1.5 t, how much fuel will it use?
+                </p>
+
+                <p class="mb-6">
+                    A line through the origin is too strict for real cars. A line needs <strong>two numbers</strong>: where it starts and how steep it is. The slope $\beta_1$ is the steepness, the intercept $\beta_0$ is the height at weight $0$. Every pair $(\beta_0, \beta_1)$ is a different line.
+                </p>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$\hat{y} = \beta_0 + \beta_1 x$$
+                    </div>
+                </div>
+
+                <p class="mb-6">
+                    This is linear regression with one feature: the input goes in, is multiplied by $\beta_1$, then $\beta_0$ is added. Try a guess, $\beta_0 = 0$ and $\beta_1 = 6$. A $1.5$ t car gets $\hat{y} = 0 + 6 \times 1.5 = 9$ litres per 100 km. Play with both knobs below.
+                </p>
+
+                <figure class="my-8 font-sans" id="wC">
+                    <div class="grid gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400 sm:grid-cols-2">
+                        <div>
+                            <label for="wC-b0" class="whitespace-nowrap">Intercept $\beta_0$ = <span id="wC-b0v" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">0.0</span></label>
+                            <input id="wC-b0" type="range" min="-4" max="6" step="0.1" value="0" class="lesson-range mt-2">
+                        </div>
+                        <div>
+                            <label for="wC-b1" class="whitespace-nowrap">Slope $\beta_1$ = <span id="wC-b1v" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">6.0</span></label>
+                            <input id="wC-b1" type="range" min="0" max="12" step="0.1" value="6" class="lesson-range mt-2">
+                        </div>
+                    </div>
+                    <div class="mb-3 text-sm text-gray-600 dark:text-gray-400">
+                        <label for="wC-x">Weight $x$ = <span id="wC-xv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">1.5</span> t</label>
+                        <input id="wC-x" type="range" min="0.5" max="2.5" step="0.1" value="1.5" class="lesson-range mt-2">
+                    </div>
+                    <svg id="wC-svg" viewBox="0 0 640 260" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img" aria-label="A line with adjustable intercept and slope for fuel use against weight"></svg>
+                    <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
+                        <button id="wC-guess" class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400">Our guess (0, 6)</button>
+                        <button id="wC-best" class="px-3 py-1.5 rounded-full border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400">Best line (−0.9, 9.0)</button>
+                    </div>
+                    <div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wC-readout"></div>
+                    <figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">
+                        Figure 5.1 — Interactive. The line $\hat{y} = \beta_0 + \beta_1 x$ for any two knobs. The data dots are not drawn here: the loss values below were measured on the 398 cars.
+                    </figcaption>
+                </figure>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The loss, again</h3>
+
+                <p class="mb-6">
+                    Same recipe as before. For every car the error is prediction minus reality, and the loss is the average of the squared errors over all cars. Our guess $(0, 6)$ has $L = 14.4$. With both knobs at $0$ the line is flat and the loss is $140.9$.
+                </p>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">From one knob to two</h3>
+
+                <p class="mb-6">
+                    With two knobs the bowl becomes a surface. Seen from above it is a map of rings: every ring is a set of lines with the same loss. Each knob feels its own slope and steps against it. All the slopes together are called the <strong>gradient</strong>.
+                </p>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$\beta_0 \leftarrow \beta_0 - \eta \cdot \text{slope}_0, \qquad \beta_1 \leftarrow \beta_1 - \eta \cdot \text{slope}_1$$
+                    </div>
+                </div>
+
+                <p class="mb-6">
+                    Starting from $(0, 0)$ the walk looks like this. The line tilts up, the loss drops fast, then the steps shrink because the ground flattens near the bottom.
+                </p>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4">Step</th>
+                                <th class="py-3 px-4">$\beta_0$</th>
+                                <th class="py-3 px-4">$\beta_1$</th>
+                                <th class="py-3 pl-4">Loss</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">0</td><td class="py-3 px-4">0.0</td><td class="py-3 px-4">0.0</td><td class="py-3 pl-4">140.9</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">5</td><td class="py-3 px-4">3.1</td><td class="py-3 px-4">4.7</td><td class="py-3 pl-4">9.3</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">100</td><td class="py-3 px-4">2.0</td><td class="py-3 px-4">6.9</td><td class="py-3 pl-4">3.9</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2000</td><td class="py-3 px-4">−0.9</td><td class="py-3 px-4">9.0</td><td class="py-3 pl-4">3.3</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> Between step 5 and step 100 the loss only goes from $9.3$ to $3.9$, but $\beta_0$ and $\beta_1$ keep changing. The path bends along a narrow valley: the bowl is long and thin, so the walk is slow near the end. Remember this, it is the reason for scaling in the next chapter.
+                </div>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">When do we stop?</h3>
+
+                <p class="mb-6">
+                    We cannot walk forever. Pick a small number $\varepsilon$, the <strong>threshold</strong>, and stop when one step lowers the loss by less than $\varepsilon$. The three choices below were measured on the cars.
+                </p>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4">Threshold $\varepsilon$</th>
+                                <th class="py-3 px-4">Stops at step</th>
+                                <th class="py-3 px-4">Loss</th>
+                                <th class="py-3 pl-4">Verdict</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">0.1</td><td class="py-3 px-4">10</td><td class="py-3 px-4">5.0</td><td class="py-3 pl-4">too big: still far from 3.3</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">0.001</td><td class="py-3 px-4">285</td><td class="py-3 px-4">3.4</td><td class="py-3 pl-4">just right</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">0.00001</td><td class="py-3 px-4">739</td><td class="py-3 px-4">3.3</td><td class="py-3 pl-4">too small: same loss, 2.6× the steps</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="my-6 pl-4 border-l border-amber-500/60 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-amber-500">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Common Pitfall:</span> A threshold alone is not safe. In practice also set a maximum number of steps, just in case the loss never settles.
+                </div>
+
+                <p class="mb-6">
+                    The best line for the cars is $\hat{y} = -0.9 + 9.0\,x$. The loss fell from $14.4$ to $3.3$, and a $1.5$ t car is predicted to use about $-0.9 + 9.0 \times 1.5 \approx 12.6$ litres per 100 km.
+                </p>
+            </section>
+
+            <!-- Chapter 6 -->
+            <section id="sec-penguins" class="scroll-mt-28 w-full reveal-section">
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 06</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Many Features: Penguins</h2>
+
+                <p class="mb-6">
+                    Cars had one feature. Now each penguin has four: flipper length, bill length, bill depth and sex ($0$ = female, $1$ = male). The goal is to predict body mass. There are <strong>333 penguins</strong> from Palmer Station, Antarctica. More features means more knobs, but the recipe stays: model, loss, optimize.
+                </p>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4">Flipper (mm)</th>
+                                <th class="py-3 px-4">Bill length (mm)</th>
+                                <th class="py-3 px-4">Bill depth (mm)</th>
+                                <th class="py-3 px-4">Sex</th>
+                                <th class="py-3 pl-4">Mass (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">181</td><td class="py-3 px-4">39.1</td><td class="py-3 px-4">18.7</td><td class="py-3 px-4">1</td><td class="py-3 pl-4">3.75</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">195</td><td class="py-3 px-4">35.5</td><td class="py-3 px-4">16.2</td><td class="py-3 px-4">0</td><td class="py-3 pl-4">3.35</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">197</td><td class="py-3 px-4">52.7</td><td class="py-3 px-4">19.8</td><td class="py-3 px-4">1</td><td class="py-3 pl-4">3.73</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">219</td><td class="py-3 px-4">44.4</td><td class="py-3 px-4">17.3</td><td class="py-3 px-4">1</td><td class="py-3 pl-4">5.25</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Model: every feature gets a knob</h3>
+
+                <p class="mb-6">
+                    Multiply each input by its own knob, add everything up, then add $\beta_0$. One feature gives $2$ knobs (a line). Four features give $5$ knobs. Nothing else changes.
+                </p>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + \beta_4 x_4$$
+                    </div>
+                </div>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Loss: the same one</h3>
+
+                <p class="mb-6">
+                    Start with all knobs at $0$, so every prediction is $0$ kg. The error of each penguin is just minus its real mass, and the squared errors are large.
+                </p>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4">Penguin</th>
+                                <th class="py-3 px-4">Real mass $y$</th>
+                                <th class="py-3 px-4">Prediction $\hat{y}$</th>
+                                <th class="py-3 px-4">Error $\hat{y} - y$</th>
+                                <th class="py-3 pl-4">Error²</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">#1</td><td class="py-3 px-4">3.75</td><td class="py-3 px-4">0.00</td><td class="py-3 px-4">−3.75</td><td class="py-3 pl-4">14.1</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">#151</td><td class="py-3 px-4">3.73</td><td class="py-3 px-4">0.00</td><td class="py-3 px-4">−3.72</td><td class="py-3 pl-4">13.8</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">#251</td><td class="py-3 px-4">5.25</td><td class="py-3 px-4">0.00</td><td class="py-3 px-4">−5.25</td><td class="py-3 pl-4">27.6</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="mb-6">
+                    The average over all $333$ penguins is $L = 18.3$. Huge, because the line sits at $0$. The walk downhill will fix that.
+                </p>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Optimize: first, the same scale</h3>
+
+                <p class="mb-6">
+                    Features live on very different scales: flipper is about $200$, bill depth about $17$, and sex is $0$ or $1$. A knob on a big feature moves the loss much more than a knob on a small one, so the bowl becomes a long narrow valley, exactly like the cars. The fix is to <strong>rescale</strong> each feature: subtract its average and divide by its spread.
+                </p>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$x_{\text{new}} = \frac{x - \text{average}}{\text{spread}}$$
+                    </div>
+                </div>
+
+                <p class="mb-6">
+                    After rescaling every feature sits roughly between $-3$ and $3$. Equal scales make the bowl round, and the walk goes almost straight to the center.
+                </p>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4">Step</th>
+                                <th class="py-3 px-4">Loss</th>
+                                <th class="py-3 px-4">$\beta_0$</th>
+                                <th class="py-3 px-4">$\beta_1$</th>
+                                <th class="py-3 px-4">$\beta_2$</th>
+                                <th class="py-3 px-4">$\beta_3$</th>
+                                <th class="py-3 pl-4">$\beta_4$</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">start</td><td class="py-3 px-4">18.35</td><td class="py-3 px-4">0.00</td><td class="py-3 px-4">0.00</td><td class="py-3 px-4">0.00</td><td class="py-3 px-4">0.00</td><td class="py-3 pl-4">0.00</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">few steps</td><td class="py-3 px-4">2.04</td><td class="py-3 px-4">2.83</td><td class="py-3 px-4">0.35</td><td class="py-3 px-4">0.17</td><td class="py-3 px-4">−0.18</td><td class="py-3 pl-4">0.19</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">later</td><td class="py-3 px-4">0.12</td><td class="py-3 px-4">4.16</td><td class="py-3 px-4">0.46</td><td class="py-3 px-4">0.06</td><td class="py-3 px-4">−0.20</td><td class="py-3 pl-4">0.27</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">bottom</td><td class="py-3 px-4">0.11</td><td class="py-3 px-4">4.21</td><td class="py-3 px-4">0.54</td><td class="py-3 px-4">−0.01</td><td class="py-3 px-4">−0.17</td><td class="py-3 pl-4">0.27</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> The loss falls from $18.35$ to $0.11$ and the five knobs settle. Same recipe as for the cars, just more knobs.
+                </div>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Do more features help?</h3>
+
+                <p class="mb-6">
+                    Yes, a little. Flipper length alone reaches a loss of $0.154$, all four features reach $0.114$. The knobs also tell a story: $+1$ mm of flipper is about $+39$ g, a male penguin is about $+541$ g heavier, and bill length is close to $0$, so it adds almost nothing once the other features are known.
+                </p>
+            </section>
+            <!-- Chapter 7 -->
+            <section id="sec-logistic" class="scroll-mt-28 w-full reveal-section">
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 07</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Logistic Regression: Yes or No</h2>
+
+                <p class="mb-6">
+                    Now the answer is a category, not a number: which penguin is this, an <strong>Adelie</strong> or a <strong>Gentoo</strong>? We code it as a number, Adelie $= 0$ and Gentoo $= 1$, and use the flipper length as the input. Gentoo flippers are longer, but the two groups overlap a bit.
+                </p>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Why not just a straight line?</h3>
+
+                <p class="mb-6">
+                    Try linear regression on the $0/1$ labels. The line goes below $0$ and above $1$, which makes no sense for a yes/no answer. We want an output that always stays between $0$ and $1$: a <strong>probability</strong>.
+                </p>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Squash the line: the sigmoid</h3>
+
+                <p class="mb-6">
+                    The <strong>sigmoid</strong> squeezes any number $z$ into the range $0$ to $1$. A big negative number goes close to $0$, zero goes to exactly $0.5$, and a big positive number goes close to $1$.
+                </p>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$\sigma(z) = \frac{1}{1 + e^{-z}}$$
+                    </div>
+                </div>
+
+                <figure class="my-8 font-sans" id="wD">
+                    <div class="flex items-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
+                        <label for="wD-z" class="whitespace-nowrap">Input $z$ = <span id="wD-zv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">0.0</span></label>
+                        <input id="wD-z" type="range" min="-6" max="6" step="0.1" value="0" class="lesson-range">
+                    </div>
+                    <svg id="wD-svg" viewBox="0 0 640 230" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img" aria-label="The sigmoid curve with a movable point"></svg>
+                    <div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wD-readout"></div>
+                    <figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">
+                        Figure 7.1 — Interactive. The sigmoid is S-shaped, smooth, and never leaves the interval $(0, 1)$.
+                    </figcaption>
+                </figure>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The logistic model</h3>
+
+                <p class="mb-6">
+                    Take the linear machine from before and add one new step at the end: the sigmoid. The output $\hat{p}$ is now the probability that the penguin is a Gentoo.
+                </p>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$\hat{p} = \sigma(\beta_0 + \beta_1 x)$$
+                    </div>
+                </div>
+
+                <p class="mb-6">
+                    After training, the curve climbs from $0$ to $1$ right where the two groups meet. The rule is simple: $\hat{p} > 0.5$ means <em>Gentoo</em>, otherwise <em>Adelie</em>. For a flipper of $215$ mm the model gives $\hat{p} > 0.99$, so Gentoo. For $205$ mm it gives $\hat{p} \approx 0.44$, so we are unsure. The boundary sits at about $205$ mm.
+                </p>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">How wrong is a probability?</h3>
+
+                <p class="mb-6">
+                    If the penguin really is a Gentoo ($y = 1$), we want $\hat{p}$ close to $1$. The loss should punish a <em>confident mistake</em> much harder than a small one. The answer is the <strong>log loss</strong>, also called cross-entropy: minus the logarithm of the probability given to the true class.
+                </p>
+
+                <div class="my-8 w-full overflow-x-auto no-scrollbar py-2">
+                    <div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">
+                        $$\ell = \begin{cases} -\ln(\hat{p}) & \text{if } y = 1 \ (\text{Gentoo}) \\ -\ln(1 - \hat{p}) & \text{if } y = 0 \ (\text{Adelie}) \end{cases}$$
+                    </div>
+                </div>
+
+                <figure class="my-8 font-sans" id="wE">
+                    <div class="flex items-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
+                        <label for="wE-p" class="whitespace-nowrap">Probability of Gentoo $\hat{p}$ = <span id="wE-pv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">0.50</span></label>
+                        <input id="wE-p" type="range" min="0.01" max="0.99" step="0.01" value="0.5" class="lesson-range">
+                    </div>
+                    <svg id="wE-svg" viewBox="0 0 640 230" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img" aria-label="Log loss for a Gentoo and for an Adelie as a function of the predicted probability"></svg>
+                    <div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wE-readout"></div>
+                    <figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">
+                        Figure 7.2 — Interactive. Green: the loss if the penguin is a Gentoo. Amber: the loss if it is an Adelie. Move $\hat{p}$ to the wrong end and the loss explodes.
+                    </figcaption>
+                </figure>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4">True class</th>
+                                <th class="py-3 px-4">Model says</th>
+                                <th class="py-3 pl-4">Loss</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Gentoo ($y=1$)</td><td class="py-3 px-4">$\hat{p} = 0.99$</td><td class="py-3 pl-4">$-\ln(0.99) = 0.01$</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Gentoo ($y=1$)</td><td class="py-3 px-4">$\hat{p} = 0.50$</td><td class="py-3 pl-4">$-\ln(0.50) = 0.69$</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Gentoo ($y=1$)</td><td class="py-3 px-4">$\hat{p} = 0.05$</td><td class="py-3 pl-4">$-\ln(0.05) = 3.0$</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Adelie ($y=0$)</td><td class="py-3 px-4">$\hat{p} = 0.05$ for Gentoo</td><td class="py-3 pl-4">$-\ln(0.95) = 0.05$</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="mb-6">
+                    The training loss is the <strong>average of this number over all penguins</strong>, just like the average of squared errors in linear regression.
+                </p>
+
+                <div class="my-6 pl-4 border-l border-amber-500/60 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-amber-500">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Common Pitfall:</span> Log loss is not defined at exactly $\hat{p} = 0$ or $1$ for the wrong class, because $-\ln(0)$ is infinite. This is why the slider above stops at $0.01$ and $0.99$.
+                </div>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The same recipe, again</h3>
+
+                <p class="mb-6">
+                    Logistic regression is linear regression with two small swaps. And we still walk downhill with gradient descent.
+                </p>
+
+                <div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium">
+                                <th class="py-3 pr-4"></th>
+                                <th class="py-3 px-4">Linear regression</th>
+                                <th class="py-3 pl-4">Logistic regression</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Answer</td><td class="py-3 px-4">a number</td><td class="py-3 pl-4">a probability</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1. Model</td><td class="py-3 px-4">$\beta_0 + \beta_1 x$</td><td class="py-3 pl-4">$\sigma(\beta_0 + \beta_1 x)$</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2. Loss</td><td class="py-3 px-4">squared error</td><td class="py-3 pl-4">log loss</td></tr>
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">3. Optimize</td><td class="py-3 px-4">gradient descent</td><td class="py-3 pl-4">gradient descent</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Chapter 8 -->
+            <section id="sec-neurons" class="scroll-mt-28 w-full reveal-section">
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 08</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">One Neuron, Then a Network</h2>
+
+                <p class="mb-6">
+                    A <strong>neuron</strong> adds up its inputs, each multiplied by a weight, and then applies the sigmoid. That is exactly the logistic model we just built, with more inputs allowed. One neuron is logistic regression.
+                </p>
+
+                <figure class="my-8">
+                    <div class="flex flex-col items-center">
+                        <svg viewBox="0 0 520 220" class="w-full max-w-[520px] h-auto text-gray-500 dark:text-gray-400" role="img" aria-label="Three inputs with weights feeding a sum and a sigmoid that outputs a probability">
+                            <g font-size="14" fill="currentColor">
+                                <circle cx="60" cy="50" r="18" fill="none" stroke="#3b82f6" stroke-width="2"/><text x="60" y="55" text-anchor="middle" fill="#3b82f6">x₁</text>
+                                <circle cx="60" cy="110" r="18" fill="none" stroke="#3b82f6" stroke-width="2"/><text x="60" y="115" text-anchor="middle" fill="#3b82f6">x₂</text>
+                                <circle cx="60" cy="170" r="18" fill="none" stroke="#3b82f6" stroke-width="2"/><text x="60" y="175" text-anchor="middle" fill="#3b82f6">x₃</text>
+                                <line x1="78" y1="50" x2="262" y2="104" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <line x1="78" y1="110" x2="262" y2="110" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <line x1="78" y1="170" x2="262" y2="116" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <text x="150" y="64" text-anchor="middle">w₁</text>
+                                <text x="170" y="104" text-anchor="middle">w₂</text>
+                                <text x="150" y="160" text-anchor="middle">w₃</text>
+                                <circle cx="290" cy="110" r="28" fill="none" stroke="#10b981" stroke-width="2.5"/><text x="290" y="117" text-anchor="middle" font-size="22" fill="#10b981">Σ</text>
+                                <line x1="318" y1="110" x2="358" y2="110" stroke="currentColor" stroke-width="1.5"/>
+                                <rect x="358" y="88" width="56" height="44" rx="10" fill="none" stroke="#f59e0b" stroke-width="2.5"/><text x="386" y="116" text-anchor="middle" font-size="18" fill="#f59e0b">σ</text>
+                                <line x1="414" y1="110" x2="454" y2="110" stroke="currentColor" stroke-width="1.5"/>
+                                <text x="478" y="116" text-anchor="middle" font-size="18" fill="currentColor">p̂</text>
+                                <text x="60" y="214" text-anchor="middle" font-size="12">inputs</text>
+                                <text x="290" y="168" text-anchor="middle" font-size="12">sum</text>
+                                <text x="386" y="168" text-anchor="middle" font-size="12">sigmoid</text>
+                                <text x="478" y="140" text-anchor="middle" font-size="12">probability</text>
+                            </g>
+                        </svg>
+                    </div>
+                    <figcaption class="mt-3 text-center font-sans text-xs text-gray-400 dark:text-gray-500">
+                        Figure 8.1 — One neuron: weights, a sum, a sigmoid. It is logistic regression with three inputs.
+                    </figcaption>
+                </figure>
+
+                <p class="mb-6">
+                    Connect many neurons in layers, so that the outputs of one layer become the inputs of the next, and you get a <strong>neural network</strong>. The loss is the same, gradient descent is the same, there are just more knobs to turn.
+                </p>
+
+                <figure class="my-8">
+                    <div class="flex flex-col items-center">
+                        <svg viewBox="0 0 520 240" class="w-full max-w-[520px] h-auto text-gray-500 dark:text-gray-400" role="img" aria-label="A small network: an input layer, two hidden layers and an output neuron">
+                            <g stroke="currentColor" stroke-width="1" opacity="0.35">
+                                <line x1="70" y1="60" x2="190" y2="40"/><line x1="70" y1="60" x2="190" y2="100"/><line x1="70" y1="60" x2="190" y2="160"/><line x1="70" y1="60" x2="190" y2="200"/>
+                                <line x1="70" y1="120" x2="190" y2="40"/><line x1="70" y1="120" x2="190" y2="100"/><line x1="70" y1="120" x2="190" y2="160"/><line x1="70" y1="120" x2="190" y2="200"/>
+                                <line x1="70" y1="180" x2="190" y2="40"/><line x1="70" y1="180" x2="190" y2="100"/><line x1="70" y1="180" x2="190" y2="160"/><line x1="70" y1="180" x2="190" y2="200"/>
+                                <line x1="190" y1="40" x2="320" y2="60"/><line x1="190" y1="40" x2="320" y2="120"/><line x1="190" y1="40" x2="320" y2="180"/>
+                                <line x1="190" y1="100" x2="320" y2="60"/><line x1="190" y1="100" x2="320" y2="120"/><line x1="190" y1="100" x2="320" y2="180"/>
+                                <line x1="190" y1="160" x2="320" y2="60"/><line x1="190" y1="160" x2="320" y2="120"/><line x1="190" y1="160" x2="320" y2="180"/>
+                                <line x1="190" y1="200" x2="320" y2="60"/><line x1="190" y1="200" x2="320" y2="120"/><line x1="190" y1="200" x2="320" y2="180"/>
+                                <line x1="320" y1="60" x2="440" y2="120"/><line x1="320" y1="120" x2="440" y2="120"/><line x1="320" y1="180" x2="440" y2="120"/>
+                            </g>
+                            <g stroke-width="2" fill="none">
+                                <circle cx="70" cy="60" r="12" stroke="#3b82f6"/><circle cx="70" cy="120" r="12" stroke="#3b82f6"/><circle cx="70" cy="180" r="12" stroke="#3b82f6"/>
+                                <circle cx="190" cy="40" r="12" stroke="#10b981"/><circle cx="190" cy="100" r="12" stroke="#10b981"/><circle cx="190" cy="160" r="12" stroke="#10b981"/><circle cx="190" cy="200" r="12" stroke="#10b981"/>
+                                <circle cx="320" cy="60" r="12" stroke="#10b981"/><circle cx="320" cy="120" r="12" stroke="#10b981"/><circle cx="320" cy="180" r="12" stroke="#10b981"/>
+                                <circle cx="440" cy="120" r="14" stroke="#f59e0b"/>
+                            </g>
+                            <g font-size="12" fill="currentColor" text-anchor="middle">
+                                <text x="70" y="228">input</text><text x="190" y="228">hidden layer</text><text x="320" y="228">hidden layer</text><text x="440" y="228">output</text>
+                            </g>
+                        </svg>
+                    </div>
+                    <figcaption class="mt-3 text-center font-sans text-xs text-gray-400 dark:text-gray-500">
+                        Figure 8.2 — A small network. Real ones have many more layers and neurons than this sketch.
+                    </figcaption>
+                </figure>
+
+                <h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Why this matters</h3>
+
+                <p class="mb-6">
+                    Everything in this lesson is how modern AI learns. Bigger models, same idea: a model, a loss, and a walk downhill. Language models read and write text, vision models recognize faces, cars and tumors in scans, speech models power voice assistants and translation, and game and robot agents learn to move and to play.
+                </p>
+
+                <div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500">
+                    <span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> Our line for the cars has $2$ parameters. A modern neural network has billions. The knobs multiply, the recipe does not change.
+                </div>
+            </section>
+
+            <!-- Chapter 9 -->
+            <section id="sec-recap" class="scroll-mt-28 w-full reveal-section">
+                <span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 09</span>
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">What We Learned</h2>
+
+                <p class="mb-6">Three ideas carry from a tiny line all the way to neural networks.</p>
+
+                <div class="my-8 grid gap-4 font-sans sm:grid-cols-3">
+                    <div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800">
+                        <div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">1 · Model</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">A simple machine that turns an input into a prediction.</div>
+                    </div>
+                    <div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800">
+                        <div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">2 · Loss</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">One number that says how wrong the model is.</div>
+                    </div>
+                    <div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800">
+                        <div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">3 · Optimize</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Walk downhill on the loss with gradient descent.</div>
+                    </div>
+                </div>
+
+                <p class="mb-6">
+                    Thank you! Questions?
+                </p>
+            </section>
+
+            <!-- Glossary -->
+            <section id="sec-glossary" class="scroll-mt-28 w-full reveal-section">
+                <h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Glossary &amp; Terminology</h2>
+                <dl class="font-sans text-sm sm:text-base space-y-5">
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Regression / classification</dt><dd class="text-gray-600 dark:text-gray-400">Two kinds of questions: the answer is a number, or the answer is a category.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Model, $\hat{y}$</dt><dd class="text-gray-600 dark:text-gray-400">A machine that turns an input into a prediction. $\hat{y}$ (“y-hat”) is the prediction.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Knob, parameter, $\beta$</dt><dd class="text-gray-600 dark:text-gray-400">A number inside the model that training adjusts. $\beta_0$ is the intercept, $\beta_1$ the slope.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Error</dt><dd class="text-gray-600 dark:text-gray-400">The gap between prediction and reality for one example.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Loss, MSE</dt><dd class="text-gray-600 dark:text-gray-400">One number for how wrong the model is. Mean squared error is the average of the squared errors.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Gradient descent</dt><dd class="text-gray-600 dark:text-gray-400">Walk downhill on the loss: $\beta \leftarrow \beta - \eta \cdot \text{slope}$.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Step size, learning rate, $\eta$</dt><dd class="text-gray-600 dark:text-gray-400">How far one step goes. Too small is slow, too big overshoots.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Gradient</dt><dd class="text-gray-600 dark:text-gray-400">All the slopes of the loss, one for each knob, taken together.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Threshold, $\varepsilon$</dt><dd class="text-gray-600 dark:text-gray-400">Stop when one step lowers the loss by less than $\varepsilon$.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Rescaling</dt><dd class="text-gray-600 dark:text-gray-400">Subtract the average and divide by the spread, so all features share one scale.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Sigmoid, $\sigma$</dt><dd class="text-gray-600 dark:text-gray-400">A function that squeezes any number into $(0, 1)$.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Log loss, cross-entropy</dt><dd class="text-gray-600 dark:text-gray-400">Minus the log of the probability given to the true class. The loss of logistic regression.</dd></div>
+                    <div><dt class="font-medium text-gray-900 dark:text-gray-100">Neuron, neural network</dt><dd class="text-gray-600 dark:text-gray-400">A weighted sum plus a sigmoid. A network is many neurons in layers.</dd></div>
+                </dl>
+            </section>
+
+        </div>
+    </main>
+
+    <div class="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 font-sans max-w-[calc(100vw-2rem)]">
+        <nav id="menuList" class="absolute bottom-full left-0 mb-3 w-[280px] max-w-[calc(100vw-2rem)] max-h-[50vh] overflow-y-auto bg-white/95 dark:bg-darkCard/95 backdrop-blur-md text-gray-700 dark:text-gray-300 rounded-xl p-2 transition-all duration-300 ease-out opacity-0 translate-y-2 scale-95 pointer-events-none shadow-2xl border border-gray-200/60 dark:border-gray-800/80">
+            <ul class="flex flex-col space-y-1 text-sm font-normal">
+                <li><a href="#sec-agenda" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">Agenda</a></li>
+                <li><a href="#sec-kinds" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">1. Two Kinds of Questions</a></li>
+                <li><a href="#sec-model" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">2. A Model with One Knob</a></li>
+                <li><a href="#sec-loss" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">3. Loss: How Wrong Is the Line?</a></li>
+                <li><a href="#sec-descent" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">4. Gradient Descent</a></li>
+                <li><a href="#sec-cars" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">5. Cars and Two Knobs</a></li>
+                <li><a href="#sec-penguins" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">6. Many Features: Penguins</a></li>
+                <li><a href="#sec-logistic" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">7. Logistic Regression</a></li>
+                <li><a href="#sec-neurons" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">8. One Neuron, a Network</a></li>
+                <li><a href="#sec-recap" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">9. What We Learned</a></li>
+                <li><a href="#sec-glossary" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">Glossary</a></li>
+            </ul>
+        </nav>
+
+        <div id="controlBar" class="bg-white/90 dark:bg-darkCard/90 backdrop-blur-md text-gray-800 dark:text-gray-200 rounded-full px-4 sm:px-5 py-2.5 sm:py-3 shadow-2xl flex items-center gap-3 sm:gap-4 cursor-pointer hover:scale-[1.03] transition-transform duration-200 select-none border border-gray-200/60 dark:border-gray-800/80">
+            <button id="indexBtn" class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium focus:outline-none hover:opacity-80 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+                <span>Index</span>
+                <svg id="arrowIcon" class="w-2.5 h-2.5 transition-transform duration-300 ml-0.5" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 5L5 1L9 5"/>
+                </svg>
+            </button>
+            <div class="w-px h-3.5 bg-gray-200 dark:bg-white/20"></div>
+            <button id="themeToggle" class="p-1 hover:text-gray-900 dark:hover:text-white transition-colors focus:outline-none hover:rotate-12" title="Toggle Theme">
+                <svg id="sunIcon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg id="moonIcon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+            <div class="w-px h-3.5 bg-gray-200 dark:bg-white/20"></div>
+            <div class="text-xs sm:text-sm font-medium tabular-nums min-w-[3ch] text-right" id="progressDisplay">0%</div>
+        </div>
+    </div>
+
+    <script>
+        const controlBar = document.getElementById('controlBar');
+        const menuList = document.getElementById('menuList');
+        const arrowIcon = document.getElementById('arrowIcon');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const links = document.querySelectorAll('.menu-link');
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        let isOpen = false;
+
+        try {
+            if (localStorage.getItem('theme') === 'light') htmlElement.classList.remove('dark');
+        } catch (e) {}
+
+        function toggleMenu() {
+            isOpen = !isOpen;
+            if (isOpen) {
+                menuList.classList.remove('opacity-0', 'translate-y-2', 'scale-95', 'pointer-events-none');
+                arrowIcon.classList.add('rotate-180');
+            } else {
+                menuList.classList.add('opacity-0', 'translate-y-2', 'scale-95', 'pointer-events-none');
+                arrowIcon.classList.remove('rotate-180');
+            }
+        }
+
+        controlBar.addEventListener('click', (e) => {
+            if (e.target.closest('#themeToggle')) return;
+            toggleMenu();
+        });
+        document.addEventListener('click', (e) => {
+            if (!menuList.contains(e.target) && !controlBar.contains(e.target) && isOpen) toggleMenu();
+        });
+        links.forEach(link => link.addEventListener('click', () => { if (isOpen) toggleMenu(); }));
+
+        themeToggle.addEventListener('click', () => {
+            const dark = htmlElement.classList.toggle('dark');
+            try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+        });
+
+        function updateProgress() {
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            let p = docHeight > 0 ? Math.round((window.scrollY / docHeight) * 100) : 0;
+            progressDisplay.textContent = Math.max(0, Math.min(100, p)) + '%';
+        }
+        window.addEventListener('scroll', updateProgress);
+        window.addEventListener('resize', updateProgress);
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => entry.target.classList.toggle('active', entry.isIntersecting));
+        }, { root: null, rootMargin: '0px 0px -5% 0px', threshold: 0.05 });
+        document.querySelectorAll('.reveal-section').forEach(s => revealObserver.observe(s));
+
+        const menuObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const id = entry.target.getAttribute('id');
+                links.forEach(link => {
+                    const on = link.getAttribute('href') === '#' + id;
+                    ['bg-gray-100', 'dark:bg-white/10', 'font-medium', 'text-gray-900', 'dark:text-white'].forEach(c => link.classList.toggle(c, on));
+                });
+            });
+        }, { root: null, rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+        document.querySelectorAll('section[id]').forEach(s => menuObserver.observe(s));
+
+        const NS = 'http://www.w3.org/2000/svg';
+        const GREEN = '#10b981', RED = '#ef4444', AMBER = '#f59e0b';
+        function el(parent, name, attrs, text) {
+            const e = document.createElementNS(NS, name);
+            for (const k in attrs) e.setAttribute(k, attrs[k]);
+            if (text !== undefined) e.textContent = text;
+            parent.appendChild(e);
+            return e;
+        }
+        const loss = (b) => (14 / 3) * (1 - b) * (1 - b);
+        const grad = (b) => (28 / 3) * (b - 1);
+        const fmtLoss = (v) => (v >= 1e5 ? v.toExponential(1) : v.toFixed(2));
+
+        (function widgetA() {
+            const svg = document.getElementById('wA-svg');
+            const slider = document.getElementById('wA-beta');
+            const bval = document.getElementById('wA-bval');
+            const lval = document.getElementById('wA-loss');
+            const dots = [[1, 1], [2, 2], [3, 3]];
+            const sx = (x) => 40 + (x / 3.5) * 250;
+            const sy = (y) => 210 - (y / 8) * 190;
+            const bx = (b) => 360 + (b / 2.5) * 250;
+            const by = (l) => 210 - (l / 11) * 190;
+
+            const defs = el(svg, 'defs', {});
+            const cp = el(defs, 'clipPath', { id: 'wA-clip' });
+            el(cp, 'rect', { x: 40, y: 20, width: 250, height: 190 });
+
+            el(svg, 'path', { d: 'M40 20V210H290', fill: 'none', stroke: 'currentColor', 'stroke-width': 1, opacity: 0.6 });
+            el(svg, 'path', { d: 'M360 20V210H610', fill: 'none', stroke: 'currentColor', 'stroke-width': 1, opacity: 0.6 });
+            el(svg, 'text', { x: 290, y: 230, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, 'x');
+            el(svg, 'text', { x: 36, y: 16, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, 'y');
+            el(svg, 'text', { x: 610, y: 230, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, 'β');
+            el(svg, 'text', { x: 356, y: 16, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, 'L');
+            [0, 1, 2].forEach(b => el(svg, 'text', { x: bx(b), y: 226, 'text-anchor': 'middle', 'font-size': 11, fill: 'currentColor' }, String(b)));
+            [1, 2, 3].forEach(x => el(svg, 'text', { x: sx(x), y: 226, 'text-anchor': 'middle', 'font-size': 11, fill: 'currentColor' }, String(x)));
+
+            let d = '';
+            for (let i = 0; i <= 100; i++) {
+                const b = (i / 100) * 2.5;
+                d += (i ? 'L' : 'M') + bx(b).toFixed(1) + ' ' + by(loss(b)).toFixed(1);
+            }
+            el(svg, 'path', { d, fill: 'none', stroke: GREEN, 'stroke-width': 2.5 });
+            el(svg, 'circle', { cx: bx(1), cy: by(0), r: 4, fill: 'none', stroke: GREEN, 'stroke-width': 1.5 });
+
+            const g = el(svg, 'g', { 'clip-path': 'url(#wA-clip)' });
+            const errs = dots.map(() => el(g, 'line', { stroke: RED, 'stroke-width': 2.5, 'stroke-linecap': 'round' }));
+            const line = el(g, 'line', { stroke: GREEN, 'stroke-width': 2.5, 'stroke-linecap': 'round' });
+            dots.forEach(([x, y]) => el(svg, 'circle', { cx: sx(x), cy: sy(y), r: 5.5, fill: '#3b82f6' }));
+            const drop = el(svg, 'line', { stroke: AMBER, 'stroke-width': 1.5, 'stroke-dasharray': '4 3' });
+            const mark = el(svg, 'circle', { r: 6, fill: AMBER });
+
+            function draw() {
+                const b = parseFloat(slider.value);
+                line.setAttribute('x1', sx(0)); line.setAttribute('y1', sy(0));
+                line.setAttribute('x2', sx(3.5)); line.setAttribute('y2', sy(b * 3.5));
+                dots.forEach(([x, y], i) => {
+                    errs[i].setAttribute('x1', sx(x)); errs[i].setAttribute('y1', sy(y));
+                    errs[i].setAttribute('x2', sx(x)); errs[i].setAttribute('y2', sy(b * x));
+                });
+                const L = loss(b);
+                mark.setAttribute('cx', bx(b)); mark.setAttribute('cy', by(L));
+                drop.setAttribute('x1', bx(b)); drop.setAttribute('y1', by(L));
+                drop.setAttribute('x2', bx(b)); drop.setAttribute('y2', 210);
+                bval.textContent = b.toFixed(2);
+                lval.textContent = L.toFixed(2);
+            }
+            slider.addEventListener('input', draw);
+            draw();
+        })();
+
+        (function widgetB() {
+            const svg = document.getElementById('wB-svg');
+            const slider = document.getElementById('wB-eta');
+            const eval_ = document.getElementById('wB-eval');
+            const readout = document.getElementById('wB-readout');
+            const bStep = document.getElementById('wB-step');
+            const bRun = document.getElementById('wB-run');
+            const bReset = document.getElementById('wB-reset');
+            const B0 = 0.25;
+            const sx = (b) => 40 + ((b + 1) / 4) * 560;
+            const sy = (l) => 190 - (Math.min(l, 20) / 20) * 170;
+
+            const defs = el(svg, 'defs', {});
+            const cp = el(defs, 'clipPath', { id: 'wB-clip' });
+            el(cp, 'rect', { x: 40, y: 10, width: 560, height: 180 });
+            el(svg, 'path', { d: 'M40 10V190H600', fill: 'none', stroke: 'currentColor', 'stroke-width': 1, opacity: 0.6 });
+            [-1, 0, 1, 2, 3].forEach(b => el(svg, 'text', { x: sx(b), y: 207, 'text-anchor': 'middle', 'font-size': 11, fill: 'currentColor' }, String(b)));
+            el(svg, 'text', { x: 600, y: 218, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, 'β');
+            el(svg, 'text', { x: 36, y: 14, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, 'L');
+
+            let d = '';
+            for (let i = 0; i <= 120; i++) {
+                const b = -1 + (i / 120) * 4;
+                d += (i ? 'L' : 'M') + sx(b).toFixed(1) + ' ' + sy(loss(b)).toFixed(1);
+            }
+            el(svg, 'path', { d, fill: 'none', stroke: GREEN, 'stroke-width': 2.5, 'clip-path': 'url(#wB-clip)' });
+            el(svg, 'circle', { cx: sx(1), cy: sy(0), r: 4, fill: 'none', stroke: GREEN, 'stroke-width': 1.5 });
+
+            const walk = el(svg, 'g', { 'clip-path': 'url(#wB-clip)' });
+            let hist = [B0];
+            let timer = null;
+
+            function draw() {
+                walk.innerHTML = '';
+                for (let i = 1; i < hist.length; i++) {
+                    el(walk, 'line', { x1: sx(hist[i - 1]), y1: sy(loss(hist[i - 1])), x2: sx(hist[i]), y2: sy(loss(hist[i])), stroke: AMBER, 'stroke-width': 1.5, opacity: 0.7 });
+                }
+                hist.forEach((b, i) => {
+                    el(walk, 'circle', { cx: sx(b), cy: sy(loss(b)), r: i === hist.length - 1 ? 6 : 3.5, fill: i === hist.length - 1 ? AMBER : '#3b82f6' });
+                });
+                const b = hist[hist.length - 1];
+                readout.textContent = 'step ' + (hist.length - 1) + ': β = ' + (Math.abs(b) >= 1e5 ? b.toExponential(2) : b.toFixed(3)) + ', loss = ' + fmtLoss(loss(b));
+            }
+            function step() {
+                if (hist.length > 400) return;
+                const b = hist[hist.length - 1];
+                hist.push(b - parseFloat(slider.value) * grad(b));
+                draw();
+            }
+            function stop() { if (timer) { clearInterval(timer); timer = null; } }
+            function reset() { stop(); hist = [B0]; draw(); }
+
+            slider.addEventListener('input', () => { eval_.textContent = parseFloat(slider.value).toFixed(2); reset(); });
+            bStep.addEventListener('click', () => { stop(); step(); });
+            bRun.addEventListener('click', () => {
+                stop();
+                let n = 0;
+                timer = setInterval(() => { step(); if (++n >= 20) stop(); }, 140);
+            });
+            bReset.addEventListener('click', reset);
+            draw();
+        })();
+
+        (function widgetC() {
+            const svg = document.getElementById('wC-svg');
+            const s0 = document.getElementById('wC-b0');
+            const s1 = document.getElementById('wC-b1');
+            const sxIn = document.getElementById('wC-x');
+            const readout = document.getElementById('wC-readout');
+            const sx = (x) => 50 + (x / 2.5) * 560;
+            const sy = (y) => 230 - (y / 25) * 210;
+
+            const defs = el(svg, 'defs', {});
+            const cp = el(defs, 'clipPath', { id: 'wC-clip' });
+            el(cp, 'rect', { x: 50, y: 20, width: 560, height: 210 });
+            el(svg, 'path', { d: 'M50 20V230H610', fill: 'none', stroke: 'currentColor', 'stroke-width': 1, opacity: 0.6 });
+            [0.5, 1, 1.5, 2, 2.5].forEach(x => el(svg, 'text', { x: sx(x), y: 247, 'text-anchor': 'middle', 'font-size': 11, fill: 'currentColor' }, String(x)));
+            [0, 5, 10, 15, 20, 25].forEach(y => el(svg, 'text', { x: 44, y: sy(y) + 4, 'text-anchor': 'end', 'font-size': 11, fill: 'currentColor' }, String(y)));
+            el(svg, 'text', { x: 610, y: 258, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, 'weight (tonnes)');
+            el(svg, 'text', { x: 54, y: 14, 'font-size': 12, fill: 'currentColor' }, 'fuel use, L / 100 km');
+
+            const g = el(svg, 'g', { 'clip-path': 'url(#wC-clip)' });
+            const line = el(g, 'line', { stroke: GREEN, 'stroke-width': 2.5, 'stroke-linecap': 'round' });
+            const drop = el(svg, 'line', { stroke: AMBER, 'stroke-width': 1.5, 'stroke-dasharray': '4 3' });
+            const mark = el(svg, 'circle', { r: 6, fill: AMBER });
+
+            function draw() {
+                const b0 = parseFloat(s0.value), b1 = parseFloat(s1.value), x = parseFloat(sxIn.value);
+                const y = b0 + b1 * x;
+                line.setAttribute('x1', sx(0)); line.setAttribute('y1', sy(b0));
+                line.setAttribute('x2', sx(2.5)); line.setAttribute('y2', sy(b0 + b1 * 2.5));
+                mark.setAttribute('cx', sx(x)); mark.setAttribute('cy', Math.max(20, Math.min(230, sy(y))));
+                drop.setAttribute('x1', sx(x)); drop.setAttribute('y1', Math.max(20, Math.min(230, sy(y))));
+                drop.setAttribute('x2', sx(x)); drop.setAttribute('y2', 230);
+                document.getElementById('wC-b0v').textContent = b0.toFixed(1);
+                document.getElementById('wC-b1v').textContent = b1.toFixed(1);
+                document.getElementById('wC-xv').textContent = x.toFixed(1);
+                readout.textContent = 'ŷ = ' + b0.toFixed(1) + ' + ' + b1.toFixed(1) + ' × ' + x.toFixed(1) + ' = ' + y.toFixed(1) + ' L / 100 km';
+            }
+            [s0, s1, sxIn].forEach(i => i.addEventListener('input', draw));
+            document.getElementById('wC-guess').addEventListener('click', () => { s0.value = 0; s1.value = 6; draw(); });
+            document.getElementById('wC-best').addEventListener('click', () => { s0.value = -0.9; s1.value = 9; draw(); });
+            draw();
+        })();
+
+        (function widgetD() {
+            const svg = document.getElementById('wD-svg');
+            const slider = document.getElementById('wD-z');
+            const readout = document.getElementById('wD-readout');
+            const sig = (z) => 1 / (1 + Math.exp(-z));
+            const sx = (z) => 50 + ((z + 6) / 12) * 560;
+            const sy = (p) => 200 - p * 180;
+
+            el(svg, 'path', { d: 'M50 20V200H610', fill: 'none', stroke: 'currentColor', 'stroke-width': 1, opacity: 0.6 });
+            [0, 0.5, 1].forEach(p => {
+                el(svg, 'text', { x: 44, y: sy(p) + 4, 'text-anchor': 'end', 'font-size': 11, fill: 'currentColor' }, String(p));
+                el(svg, 'line', { x1: 50, y1: sy(p), x2: 610, y2: sy(p), stroke: 'currentColor', 'stroke-width': 0.8, 'stroke-dasharray': '3 4', opacity: 0.35 });
+            });
+            [-6, -4, -2, 0, 2, 4, 6].forEach(z => el(svg, 'text', { x: sx(z), y: 217, 'text-anchor': 'middle', 'font-size': 11, fill: 'currentColor' }, String(z)));
+            el(svg, 'text', { x: 610, y: 228, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, 'z');
+            el(svg, 'text', { x: 54, y: 14, 'font-size': 12, fill: 'currentColor' }, 'σ(z)');
+
+            let d = '';
+            for (let i = 0; i <= 120; i++) {
+                const z = -6 + (i / 120) * 12;
+                d += (i ? 'L' : 'M') + sx(z).toFixed(1) + ' ' + sy(sig(z)).toFixed(1);
+            }
+            el(svg, 'path', { d, fill: 'none', stroke: GREEN, 'stroke-width': 2.5 });
+            const drop = el(svg, 'line', { stroke: AMBER, 'stroke-width': 1.5, 'stroke-dasharray': '4 3' });
+            const mark = el(svg, 'circle', { r: 6, fill: AMBER });
+
+            function draw() {
+                const z = parseFloat(slider.value);
+                const p = sig(z);
+                mark.setAttribute('cx', sx(z)); mark.setAttribute('cy', sy(p));
+                drop.setAttribute('x1', sx(z)); drop.setAttribute('y1', sy(p));
+                drop.setAttribute('x2', sx(z)); drop.setAttribute('y2', 200);
+                document.getElementById('wD-zv').textContent = z.toFixed(1);
+                readout.textContent = 'σ(' + z.toFixed(1) + ') = ' + p.toFixed(3);
+            }
+            slider.addEventListener('input', draw);
+            draw();
+        })();
+
+        (function widgetE() {
+            const svg = document.getElementById('wE-svg');
+            const slider = document.getElementById('wE-p');
+            const readout = document.getElementById('wE-readout');
+            const sx = (p) => 50 + p * 560;
+            const sy = (l) => 200 - (Math.min(l, 4.6) / 4.6) * 180;
+
+            el(svg, 'path', { d: 'M50 20V200H610', fill: 'none', stroke: 'currentColor', 'stroke-width': 1, opacity: 0.6 });
+            [0, 1, 2, 3, 4].forEach(l => el(svg, 'text', { x: 44, y: sy(l) + 4, 'text-anchor': 'end', 'font-size': 11, fill: 'currentColor' }, String(l)));
+            [0, 0.25, 0.5, 0.75, 1].forEach(p => el(svg, 'text', { x: sx(p), y: 217, 'text-anchor': 'middle', 'font-size': 11, fill: 'currentColor' }, String(p)));
+            el(svg, 'text', { x: 610, y: 228, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, 'predicted probability of Gentoo');
+            el(svg, 'text', { x: 54, y: 14, 'font-size': 12, fill: 'currentColor' }, 'loss');
+
+            let d1 = '', d0 = '';
+            for (let i = 0; i <= 98; i++) {
+                const p = 0.01 + (i / 98) * 0.98;
+                d1 += (i ? 'L' : 'M') + sx(p).toFixed(1) + ' ' + sy(-Math.log(p)).toFixed(1);
+                d0 += (i ? 'L' : 'M') + sx(p).toFixed(1) + ' ' + sy(-Math.log(1 - p)).toFixed(1);
+            }
+            el(svg, 'path', { d: d1, fill: 'none', stroke: GREEN, 'stroke-width': 2.5 });
+            el(svg, 'path', { d: d0, fill: 'none', stroke: AMBER, 'stroke-width': 2.5 });
+            el(svg, 'text', { x: 70, y: 60, 'font-size': 13, fill: GREEN }, 'Gentoo (y = 1): −ln p̂');
+            el(svg, 'text', { x: 600, y: 60, 'text-anchor': 'end', 'font-size': 13, fill: AMBER }, 'Adelie (y = 0): −ln(1 − p̂)');
+            const vline = el(svg, 'line', { stroke: 'currentColor', 'stroke-width': 1, 'stroke-dasharray': '4 3', opacity: 0.6 });
+            const m1 = el(svg, 'circle', { r: 5.5, fill: GREEN });
+            const m0 = el(svg, 'circle', { r: 5.5, fill: AMBER });
+
+            function draw() {
+                const p = parseFloat(slider.value);
+                const l1 = -Math.log(p), l0 = -Math.log(1 - p);
+                vline.setAttribute('x1', sx(p)); vline.setAttribute('y1', 20); vline.setAttribute('x2', sx(p)); vline.setAttribute('y2', 200);
+                m1.setAttribute('cx', sx(p)); m1.setAttribute('cy', sy(l1));
+                m0.setAttribute('cx', sx(p)); m0.setAttribute('cy', sy(l0));
+                document.getElementById('wE-pv').textContent = p.toFixed(2);
+                readout.textContent = 'if Gentoo: loss = ' + l1.toFixed(2) + '     if Adelie: loss = ' + l0.toFixed(2);
+            }
+            slider.addEventListener('input', draw);
+            draw();
+        })();
+
+        updateProgress();
+    </script>
+</body>
+</html>

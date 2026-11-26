@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Support Vector Machines: Lesson 2</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Lora', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        dark: '#121212',
+                        darkCard: '#1a1a1a',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/128/2541/2541979.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+    <!-- MathJax Configuration for Inline $...$ support -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* Полное устранение скроллбаров при сохранении плавной прокрутки */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Скрытие скроллбара у выпадающего меню */
+        #menuList::-webkit-scrollbar {
+            display: none;
+        }
+        #menuList {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Скрытие скроллбара в формулах и коде */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Плавное повторное появление секций при скролле */
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Плавная анимация раскрытия аккордеона без рывков */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .accordion-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            opacity: 0;
+        }
+        details[open] .accordion-content {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+        .accordion-content > div {
+            overflow: hidden;
+        }
+
+        /* Плавные переходы для интерактивных элементов */
+        a, button, tr, details {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Минималистичный слайдер для интерактивных виджетов */
+        input[type="range"].lesson-range {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 2px;
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 2px;
+            outline: none;
+        }
+        input[type="range"].lesson-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        input[type="range"].lesson-range::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+        input[type="range"].lesson-range::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border: 0;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-[#fcfcfc] dark:bg-[#111111] text-gray-700 dark:text-gray-300 font-serif text-[1.05rem] leading-[1.8] antialiased transition-colors duration-300 selection:bg-gray-200 dark:selection:bg-gray-800">
+
+    <!-- Main Article Container -->
+    <main class="max-w-2xl mx-auto px-5 sm:px-6 py-16 sm:py-28 min-h-[200vh] w-full">
+<header class="mb-16 sm:mb-24 reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4 block">Lesson 02 &middot; Turin Polytechnic University in Tashkent</span><h1 class="font-sans text-3xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-gray-100 leading-tight">Support Vector Machines</h1><p class="font-sans text-lg sm:text-xl text-gray-500 dark:text-gray-400 font-normal leading-relaxed">Which line is the best line? The one down the widest street. We keep the recipe (model, loss, optimize) and change the picture, the loss, and then bend the line with kernels.</p></header>
+<div class="space-y-16 sm:space-y-24 w-full">
+<section id="sec-agenda" class="scroll-mt-28 reveal-section"><h2 class="font-sans text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Agenda</h2><ol class="font-sans list-decimal pl-5 space-y-2.5 text-gray-600 dark:text-gray-400 text-sm sm:text-base"><li><a href="#sec-flowers" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Meet the Flowers</a></li><li><a href="#sec-street" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">The Widest Street</a></li><li><a href="#sec-model" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">The Model</a></li><li><a href="#sec-loss" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">The Loss</a></li><li><a href="#sec-opt" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Optimize</a></li><li><a href="#sec-kernel" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">When a Line Is Not Enough</a></li><li><a href="#sec-iris" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">The Full Iris Problem</a></li><li><a href="#sec-recap" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">What We Learned</a></li><li><a href="#sec-glossary" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Glossary &amp; Terminology</a></li></ol></section>
+
+<section id="sec-flowers" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 01</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Meet the Flowers</h2>
+<p class="mb-6">
+The last lessons gave us three models, each with the same recipe: <strong>model, loss, optimize</strong>. Today we ask a new question: is there a <em>better way to draw the line</em>?
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4"></th><th class="py-3 px-4">Linear</th><th class="py-3 px-4">Logistic</th><th class="py-3 px-4">Softmax</th><th class="py-3 px-4">Today: SVM</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Output</td><td class="py-3 px-4">a number</td><td class="py-3 px-4">a probability</td><td class="py-3 px-4">N probabilities</td><td class="py-3 px-4">?</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1. Model</td><td class="py-3 px-4">line</td><td class="py-3 px-4">line + sigmoid</td><td class="py-3 px-4">N lines + softmax</td><td class="py-3 px-4">?</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2. Loss</td><td class="py-3 px-4">squared error</td><td class="py-3 px-4">log loss</td><td class="py-3 px-4">cross-entropy</td><td class="py-3 px-4">?</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">3. Optimize</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">?</td></tr>
+</tbody></table></div>
+<div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500"><span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> In every column the optimizer is the same walk downhill. The SVM changes the picture and the loss.</div>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Our data: iris flowers</h3>
+<p class="mb-6">
+The iris data has <strong>150 real flowers</strong>, 50 of each of 3 species. For every flower we measure the petal in centimeters: length and width. Today we take two species at a time, first <strong>setosa</strong> and <strong>versicolor</strong> (100 flowers). Virginica joins later.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Flower</th><th class="py-3 px-4">Length</th><th class="py-3 px-4">Width</th><th class="py-3 px-4">Species</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">flower 1</td><td class="py-3 px-4">1.4 cm</td><td class="py-3 px-4">0.2 cm</td><td class="py-3 px-4">setosa</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">flower 2</td><td class="py-3 px-4">4.7 cm</td><td class="py-3 px-4">1.4 cm</td><td class="py-3 px-4">versicolor</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+Setosa petals are $1.0$ to $1.9$ cm long, versicolor petals $3.0$ to $5.1$ cm. Each flower is one dot, and the two groups are easy to see.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Many lines work</h3>
+<p class="mb-6">
+Take three different lines. All of them separate the 100 flowers with <strong>0 mistakes</strong>, so the training accuracy is the same: $100\%$. Which line would you trust? Ask a different question: how close is the nearest flower to each line?
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Line</th><th class="py-3 px-4">Distance to the nearest flower</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">line A</td><td class="py-3 px-4">0.04 cm</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">line B</td><td class="py-3 px-4">0.32 cm</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">line C</td><td class="py-3 px-4">0.65 cm</td></tr>
+</tbody></table></div>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Which line leaves the most room?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>Line C: its closest flower is $0.65$ cm away. A line that leaves room on both sides is safer, and that is the idea of this lesson.</p></div></div></div></details>
+</section>
+
+<section id="sec-street" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 02</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">The Widest Street</h2>
+<p class="mb-6">
+Build the widest empty street between the two groups of flowers. Three steps: draw an empty street between the groups, widen it until it touches the flowers, then take the line down the middle. That line is the SVM. The width of the street is the <strong>margin</strong>.
+</p>
+<p class="mb-6">
+For setosa against versicolor the margin is $1.30$ cm, and only <strong>2 flowers</strong> touch the edges. Those two are the <em>support vectors</em>.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Why the middle?</h3>
+<p class="mb-6">
+A new flower arrives: a versicolor, a bit smaller than ours, with a petal of $3.8 \times 0.8$ cm. A line squeezed against the data sits only $0.12$ cm from it and says <em>setosa</em>: wrong. The line in the middle of the widest street is $1.17$ cm away and says <em>versicolor</em>: right. The middle has room to spare for flowers we have not seen yet.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Support vectors: only the edge flowers matter</h3>
+<p class="mb-6">
+The flowers on the edge of the street hold it in place. Remove all the other $98$ and nothing changes: the street keeps its width of $1.30$ cm. Remove one support vector and the street moves, to $1.41$ cm.
+</p>
+<div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500"><span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> The support vectors are the only flowers the SVM listens to.</div>
+</section>
+
+<section id="sec-model" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 03</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">The Model</h2>
+<p class="mb-6">
+The model is the same linear machine as before, now read as a <strong>ruler</strong>. Six symbols will follow us until the end.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Symbol</th><th class="py-3 px-4">What it means</th><th class="py-3 px-4">Our flowers</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">$x$</td><td class="py-3 px-4">a flower: its measurements</td><td class="py-3 px-4">$(1.9, 0.4)$: length, width</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">$d$</td><td class="py-3 px-4">how many measurements a flower has</td><td class="py-3 px-4">$d = 2$</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">$\beta$</td><td class="py-3 px-4">weights: numbers the machine learns</td><td class="py-3 px-4">$\beta_0=-3.79,\ \beta_1=1.29,\ \beta_2=0.82$</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">$f$</td><td class="py-3 px-4">score: what the machine computes</td><td class="py-3 px-4">$f = -1.00$ for this flower</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">$y$</td><td class="py-3 px-4">truth: the real species, as a number</td><td class="py-3 px-4">setosa $=-1$, versicolor $=+1$</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">sign</td><td class="py-3 px-4">keep only the sign of a number</td><td class="py-3 px-4">$\text{sign}(-1.00) = -1$: setosa</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+The machine computes a <strong>score</strong> $f$ for every flower. The sign of the score gives the species.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$f(x) = \beta_0 + \sum_{j=1}^{d} \beta_j x_j, \qquad \hat{y} = \operatorname{sign}\big(f(x)\big)$$</div></div>
+<p class="mb-6">
+For a real flower of $3.0 \times 1.1$ cm: $f = -3.79 + 1.29 \cdot 3.0 + 0.82 \cdot 1.1 = 0.98 \approx 1$. This flower sits exactly on the edge of the street. Weights shown here are rounded.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>The flower gets 1 cm longer. What happens to $f$?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>$f$ grows by $1.29$, every time. A straight rule: that is what <em>linear</em> means.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Score and sign: a ruler for flowers</h3>
+<p class="mb-6">
+Every flower gets a score, a position on a ruler. The line is at $f = 0$, the street edges are at $f = -1$ and $f = +1$. Negative means the setosa side, positive the versicolor side. The farther from $0$, the surer the machine.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>A flower has $f = -2.33$. What does the sign say?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>$\text{sign} = -1$, setosa. And it is far from the street, so the machine is very sure.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The truth $y$ and the product $y \cdot f$</h3>
+<p class="mb-6">
+Multiply the truth by the score. The product $y \cdot f$ is <em>positive exactly when the machine is right</em>, and it says how safely the flower sits on its own side.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Flower</th><th class="py-3 px-4">Length</th><th class="py-3 px-4">Width</th><th class="py-3 px-4">$f$</th><th class="py-3 px-4">$y$</th><th class="py-3 px-4">$y \cdot f$</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">far setosa</td><td class="py-3 px-4">1.0</td><td class="py-3 px-4">0.2</td><td class="py-3 px-4">$-2.33$</td><td class="py-3 px-4">$-1$</td><td class="py-3 px-4">$2.33$</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">setosa on the edge</td><td class="py-3 px-4">1.9</td><td class="py-3 px-4">0.4</td><td class="py-3 px-4">$-1.00$</td><td class="py-3 px-4">$-1$</td><td class="py-3 px-4">$1.00$</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">versicolor on the edge</td><td class="py-3 px-4">3.0</td><td class="py-3 px-4">1.1</td><td class="py-3 px-4">$+1.00$</td><td class="py-3 px-4">$+1$</td><td class="py-3 px-4">$1.00$</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">far versicolor</td><td class="py-3 px-4">5.1</td><td class="py-3 px-4">1.6</td><td class="py-3 px-4">$+4.13$</td><td class="py-3 px-4">$+1$</td><td class="py-3 px-4">$4.13$</td></tr>
+</tbody></table></div>
+<ul class="list-disc pl-5 mb-6 space-y-1"><li>$y \cdot f \ge 1$: safe, outside the street</li><li>$0 \le y \cdot f \lt 1$: right side, but inside the street</li><li>$y \cdot f \lt 0$: a mistake</li></ul>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Weights decide the width of the street</h3>
+<p class="mb-6">
+Keep the same line but scale all the weights. The line stays put, only $f$ changes, so the street edges ($f = \pm 1$) move. Try it.
+</p>
+<figure class="my-8 font-sans" id="wsvm1"><div class="grid gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400 sm:grid-cols-2"><div><label for="wsvm1-s" class="whitespace-nowrap">Weights &times; = <span id="wsvm1-sv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">1</span></label><input id="wsvm1-s" type="range" min="0.25" max="3" step="0.05" value="1" class="lesson-range mt-2"></div></div><svg id="wsvm1-svg" viewBox="0 0 640 270" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img"></svg><div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wsvm1-readout"></div><figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">Figure 3.1 &mdash; Interactive. Weights times $s$: the line stays, the edges $f=\pm1$ move. Dots: the two support vectors.</figcaption></figure>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$\text{width} = \frac{2}{\|\beta\|}, \qquad \|\beta\| = \sqrt{\beta_1^2 + \beta_2^2} = \sqrt{1.29^2 + 0.82^2} = 1.53$$</div></div>
+<p class="mb-6">
+Halve the weights and the street doubles to $2.61$ cm. Double them and it shrinks to $0.65$ cm. <strong>Small weights mean a wide street.</strong>
+</p>
+</section>
+
+<section id="sec-loss" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 04</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">The Loss</h2>
+<p class="mb-6">
+<strong>The rule.</strong> A wide street needs small weights, but no flower is allowed inside the street. One rule per flower: stay outside the street, on your own side.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$\min_{\beta}\ \frac{1}{2}\sum_{j=1}^{d}\beta_j^2 \quad \text{such that} \quad y_i f(x_i) \ge 1 \ \text{ for every flower } i$$</div></div>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>What if the groups overlap and no empty street exists?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>Then the rule cannot be satisfied. We need a softer rule.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Versicolor against virginica: no empty street</h3>
+<p class="mb-6">
+These two species look alike and their petals overlap: lengths of $4.5$ to $5.1$ cm appear in both. Label versicolor $=-1$ and virginica $=+1$. The best straight line still gets <strong>5 flowers wrong</strong>.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The fine is an arrow</h3>
+<p class="mb-6">
+A flower outside the street on its own side pays nothing. Everybody else pays a <strong>fine</strong>: the way back to the safe edge, measured in $f$ (not in centimeters).
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Flower</th><th class="py-3 px-4">$y \cdot f$</th><th class="py-3 px-4">Fine</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1 versicolor (4.1, 1.3)</td><td class="py-3 px-4">2.54</td><td class="py-3 px-4">0.00</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2 virginica (4.9, 1.8)</td><td class="py-3 px-4">0.34</td><td class="py-3 px-4">0.66</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">3 versicolor (5.1, 1.6)</td><td class="py-3 px-4">&minus;0.32</td><td class="py-3 px-4">1.32</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">4 virginica (4.5, 1.7)</td><td class="py-3 px-4">&minus;0.76</td><td class="py-3 px-4">1.76</td></tr>
+</tbody></table></div>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Hinge loss: the fine as a curve</h3>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$\ell(y, f) = \max\big(0,\ 1 - y\,f\big)$$</div></div>
+<ul class="list-disc pl-5 mb-6 space-y-1"><li>$y \cdot f \ge 1$: fine $0$, the flower is safe</li><li>$0 \le y \cdot f \lt 1$: small fine, right side but inside the street</li><li>$y \cdot f \lt 0$: big fine, wrong side of the line</li></ul>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Flower 4 has $y \cdot f = -0.76$. What is its fine?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>$1 - (-0.76) = 1.76$. The farther on the wrong side, the bigger the fine.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The full SVM loss: two wishes</h3>
+<p class="mb-6">
+The loss adds two wishes: a <em>wide street</em> (small weights) and <em>few fines</em>. $C$ is the price of one unit of fine.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$L(\beta) = \frac{1}{2}\sum_{j=1}^{d}\beta_j^2 \;+\; C\sum_{i=1}^{n}\max\big(0,\ 1 - y_i f(x_i)\big)$$</div></div>
+<p class="mb-6">
+Our case: $C=1$, $d=2$, $n=100$ flowers (versicolor against virginica). The street part is $4.92$ and the fine part $13.57$, so $L = 4.92 + 13.57 = 18.49$. This is the number gradient descent will push down.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">$C$ is the price of a fine</h3>
+<p class="mb-6">
+Small $C$: fines are cheap, the street grows wide and many flowers stay inside it. Big $C$: fines are expensive and the street shrinks until it is almost empty.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">$C$</th><th class="py-3 px-4">Street width</th><th class="py-3 px-4">Inside the street or wrong</th><th class="py-3 px-4">Mistakes</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">0.1</td><td class="py-3 px-4">1.31 cm</td><td class="py-3 px-4">50 flowers</td><td class="py-3 px-4">5</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1</td><td class="py-3 px-4">0.64 cm</td><td class="py-3 px-4">23 flowers</td><td class="py-3 px-4">5</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">100</td><td class="py-3 px-4">0.22 cm</td><td class="py-3 px-4">10 flowers</td><td class="py-3 px-4">6</td></tr>
+</tbody></table></div>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Three fines for the same flower</h3>
+<p class="mb-6">
+You know two fines already: squared error and log loss. The hinge is the new one. Move $y \cdot f$ and compare.
+</p>
+<figure class="my-8 font-sans" id="wsvm2"><div class="grid gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400 sm:grid-cols-2"><div><label for="wsvm2-m" class="whitespace-nowrap">$y \cdot f$ = <span id="wsvm2-mv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">0.5</span></label><input id="wsvm2-m" type="range" min="-2" max="3" step="0.05" value="0.5" class="lesson-range mt-2"></div></div><svg id="wsvm2-svg" viewBox="0 0 640 270" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img"></svg><div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wsvm2-readout"></div><figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">Figure 4.1 &mdash; Interactive. Fine against $y \cdot f$. Squared error: $(1-yf)^2$. Log loss: $\ln(1+e^{-yf})$. Hinge: exactly $0$ from $y \cdot f = 1$.</figcaption></figure>
+<div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500"><span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> Hinge only cares about flowers near the street or on the wrong side. Safe flowers are ignored. It gives a side ($-1$ or $+1$), not a probability.</div>
+</section>
+
+<section id="sec-opt" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 05</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Optimize</h2>
+<p class="mb-6">
+The same walk downhill as in every lesson. Imagine the loss as a bowl and one weight as a ball. The slope points uphill, so we step the opposite way, and the bowl has one bottom: no traps.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$\beta \leftarrow \beta - \eta\,\nabla L(\beta)$$</div></div>
+<p class="mb-6">
+Our case: $\eta = 0.002$, starting at $\beta_1 = -0.50$. Slope at step 0 on this slice: $-56$, so the loss falls to the right.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Who pushes the line?</h3>
+<p class="mb-6">
+Only flowers inside the street or on the wrong side push the line. Safe flowers push with force $0$: they could vanish and the line would not care. After step 100, $27$ flowers push and $73$ do nothing.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$\frac{\partial L}{\partial \beta_j} = \beta_j \;-\; C\!\!\sum_{i:\ y_i f(x_i) \lt 1}\!\! y_i\, x_{ij}$$</div></div>
+<div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500"><span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> The sum runs only over the pushers. That is the whole gradient. The $\beta_j$ term is the wish for a wide street.</div>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">One step, in numbers</h3>
+<p class="mb-6">
+Start from a guess picked by hand: all $100$ flowers are inside the street or wrong, so all push. Petals are centered (minus their average).
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4"></th><th class="py-3 px-4">$\beta_1$ (length)</th><th class="py-3 px-4">$\beta_2$ (width)</th><th class="py-3 px-4">$\beta_0$</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">now</td><td class="py-3 px-4">&minus;0.50</td><td class="py-3 px-4">1.00</td><td class="py-3 px-4">0.00</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">slope of $L$ (gradient)</td><td class="py-3 px-4">&minus;65.1</td><td class="py-3 px-4">&minus;34.0</td><td class="py-3 px-4">0.0</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">step $=-\eta \times$ slope</td><td class="py-3 px-4">0.13</td><td class="py-3 px-4">0.07</td><td class="py-3 px-4">0.00</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">after the step</td><td class="py-3 px-4">&minus;0.37</td><td class="py-3 px-4">1.07</td><td class="py-3 px-4">0.00</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+The loss goes from $97.9$ to $87.1$ after one step.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Why is the step so small?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>$\eta = 0.002$ keeps us from jumping over the bottom. Many small steps instead of one big one.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">1000 small steps and when to stop</h3>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Step</th><th class="py-3 px-4">Loss</th><th class="py-3 px-4">Inside or wrong</th><th class="py-3 px-4">Mistakes</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">0</td><td class="py-3 px-4">97.9</td><td class="py-3 px-4">100</td><td class="py-3 px-4">39</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">10</td><td class="py-3 px-4">31.4</td><td class="py-3 px-4">60</td><td class="py-3 px-4">6</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">100</td><td class="py-3 px-4">19.2</td><td class="py-3 px-4">27</td><td class="py-3 px-4">6</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1000</td><td class="py-3 px-4">18.5</td><td class="py-3 px-4">23</td><td class="py-3 px-4">5</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+Nobody told the line where to go. It only followed the slope. The loss falls fast at first ($97.9 \to 31.4$ in 10 steps), then slower ($31.4 \to 19.2$), then barely moves ($19.2 \to 18.5$). When the slope is almost $0$ we are at the bottom and we stop.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Why do the steps shrink by themselves?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>$\text{step} = \eta \times \text{slope}$. Near the bottom the slope is almost $0$, so the step is too.</p></div></div></div></details>
+</section>
+
+<section id="sec-kernel" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 06</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">When a Line Is Not Enough</h2>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The temperature of tea</h3>
+<p class="mb-6">
+Too cold: bad tea. Too hot: bad tea. Just right: good tea. On a line of temperatures no single cut separates good cups from bad ones. The best single cut, at $37.5\,^\circ$C, still gets $3$ of $11$ cups wrong.
+</p>
+<p class="mb-6">
+The idea: give every cup a <strong>second number</strong>, its distance from $55\,^\circ$C, squared. Now one straight cut at $162.5$ separates the cups. Move the slider.
+</p>
+<figure class="my-8 font-sans" id="wsvm3"><div class="grid gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400 sm:grid-cols-2"><div><label for="wsvm3-t" class="whitespace-nowrap">Temperature $t$ (&deg;C) = <span id="wsvm3-tv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">30</span></label><input id="wsvm3-t" type="range" min="10" max="90" step="1" value="30" class="lesson-range mt-2"></div></div><svg id="wsvm3-svg" viewBox="0 0 640 270" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img"></svg><div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wsvm3-readout"></div><figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">Figure 6.1 &mdash; Interactive. A cup at temperature $t$ gets the new number $(t-55)^2$. Below the cut: good tea.</figcaption></figure>
+<p class="mb-6">
+In the old picture this horizontal cut is the zone <strong>$42.3$ to $67.7\,^\circ$C</strong>: a zone, not a line.
+</p>
+<div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500"><span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> The machine is still a straight cut. We only changed what we feed it.</div>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The same problem in 2D: rings</h3>
+<p class="mb-6">
+Two groups of dots: an inner ring and an outer ring. No straight line can cut a ring out of the middle. The best line gets $51\%$ right on $200$ fresh dots: a coin flip.
+</p>
+<p class="mb-6">
+Same trick: give every dot a new number, $r^2 = x_1^2 + x_2^2$, its squared distance from the center. In the new picture one straight cut works: <strong>$100\%$ right</strong>. A straight cut in the new picture is a circle in the old one.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The kernel idea: skip the building</h3>
+<p class="mb-6">
+We invented $r^2$ and $(t-55)^2$ by hand, which needs a good guess every time. A <strong>kernel</strong> is a shortcut: do not build new numbers, only ask <em>how similar are two dots?</em> (from $0$ to $1$).
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>A hundred measurements per dot and no idea of the right formula. Which route?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>The kernel. The RBF similarity only needs the distance between two dots.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Similarity: from distance to a number</h3>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$K(x, x') = \exp\!\big(-\gamma\,\|x - x'\|^2\big)$$</div></div>
+<p class="mb-6">
+Take the distance between two dots, square it, multiply by $\gamma$ and squeeze it into $0$ to $1$ with $\exp$. Close dots are very similar (near $1$), far dots are not (near $0$). Play with it.
+</p>
+<figure class="my-8 font-sans" id="wsvm4"><div class="grid gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400 sm:grid-cols-2"><div><label for="wsvm4-g" class="whitespace-nowrap">$\gamma$ = <span id="wsvm4-gv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">1</span></label><input id="wsvm4-g" type="range" min="0.1" max="10" step="0.1" value="1" class="lesson-range mt-2"></div><div><label for="wsvm4-d" class="whitespace-nowrap">distance = <span id="wsvm4-dv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">1</span></label><input id="wsvm4-d" type="range" min="0" max="3" step="0.05" value="1" class="lesson-range mt-2"></div></div><svg id="wsvm4-svg" viewBox="0 0 640 270" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img"></svg><div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wsvm4-readout"></div><figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">Figure 6.2 &mdash; Interactive. RBF similarity against distance. $\gamma$ sets how fast it falls.</figcaption></figure>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Pair with the star</th><th class="py-3 px-4">Distance</th><th class="py-3 px-4">Distance squared</th><th class="py-3 px-4">$K=\exp(-\gamma \cdot d^2)$</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">a close dot</td><td class="py-3 px-4">0.17</td><td class="py-3 px-4">0.03</td><td class="py-3 px-4">0.97</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">a far dot</td><td class="py-3 px-4">1.32</td><td class="py-3 px-4">1.75</td><td class="py-3 px-4">0.17</td></tr>
+</tbody></table></div>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">How similarity makes a boundary: votes</h3>
+<p class="mb-6">
+Every support vector votes for its ring: its weight $\alpha$ times its similarity to the new dot. The closer, the louder. Add the votes to the shift $b$: positive means inner ring, negative means outer ring.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$f(x) = b + \sum_{i \in SV} \alpha_i\, y_i\, K(x_i, x)$$</div></div>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Support vector</th><th class="py-3 px-4">$\alpha$</th><th class="py-3 px-4">$K$ to the star</th><th class="py-3 px-4">vote $\alpha \cdot y \cdot K$</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">(0.13, 0.54) inner</td><td class="py-3 px-4">9.94</td><td class="py-3 px-4">0.59</td><td class="py-3 px-4">+5.85</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">(0.31, 0.81) outer</td><td class="py-3 px-4">8.01</td><td class="py-3 px-4">0.37</td><td class="py-3 px-4">&minus;2.95</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">(&minus;0.44, &minus;0.30) inner</td><td class="py-3 px-4">2.83</td><td class="py-3 px-4">0.64</td><td class="py-3 px-4">+1.81</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">(&minus;0.82, &minus;0.48) outer</td><td class="py-3 px-4">2.46</td><td class="py-3 px-4">0.31</td><td class="py-3 px-4">&minus;0.77</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+The other $6$ support vectors and $b$ add the rest. The total is $f = 1.90$, positive, so the machine says <strong>inner ring</strong>. (Outer-ring votes are negative because $y = -1$ for the outer ring.)
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">$\gamma$: the size of one point's hill</h3>
+<p class="mb-6">
+Each dot spreads similarity around itself, and $\gamma$ sets how far. Small $\gamma$: too smooth. Medium: just right. Huge: a loop around every dot. (Noisier dots than on the votes slide, 300 of them, so the numbers differ.)
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">$\gamma$</th><th class="py-3 px-4">Train</th><th class="py-3 px-4">Test</th><th class="py-3 px-4">Support vectors</th><th class="py-3 px-4">Verdict</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">0.05</td><td class="py-3 px-4">68%</td><td class="py-3 px-4">64%</td><td class="py-3 px-4">120</td><td class="py-3 px-4">too smooth</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1</td><td class="py-3 px-4">98%</td><td class="py-3 px-4">92%</td><td class="py-3 px-4">48</td><td class="py-3 px-4">just right</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">50</td><td class="py-3 px-4">100%</td><td class="py-3 px-4">87%</td><td class="py-3 px-4">101</td><td class="py-3 px-4">memorized the noise</td></tr>
+</tbody></table></div>
+<div class="my-8 grid gap-4 font-sans sm:grid-cols-2"><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">Kernel = similarity</div><div class="text-sm text-gray-600 dark:text-gray-400">A number from 0 to 1 for any two dots.</div></div><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">Support vectors vote</div><div class="text-sm text-gray-600 dark:text-gray-400">Closer to the new dot, louder the vote.</div></div><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">$\gamma$ = size of the hill</div><div class="text-sm text-gray-600 dark:text-gray-400">Small: too smooth. Huge: memorizes noise.</div></div><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">$C$ is still the price</div><div class="text-sm text-gray-600 dark:text-gray-400">The hinge loss and the fines did not change.</div></div></div>
+<p class="mb-6">
+Other kernels exist: the <em>linear</em> kernel is our straight line from before, the <em>polynomial</em> kernel bends it by a fixed shape. RBF is the usual first try for curvy data. The kernel decides the shape of the boundary; the rest of the recipe is unchanged.
+</p>
+</section>
+
+<section id="sec-iris" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 07</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">The Full Iris Problem</h2>
+<p class="mb-6">
+Now all three species: the same $150$ flowers and the same two measurements, but $50$ flowers each of setosa, versicolor and virginica. Setosa is far from the others, versicolor and virginica touch, and versicolor sits in the middle.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>How can a machine that splits two groups handle three?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>One machine per species. Each asks: is it <em>my</em> species, or any other?</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">One street per species</h3>
+<p class="mb-6">
+Three machines on the $105$ training flowers. Setosa is easy. Versicolor sits in the middle, so one straight street cannot wrap it.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Machine</th><th class="py-3 px-4">Mistakes on the 105 training flowers</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">setosa vs the rest</td><td class="py-3 px-4">0</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">versicolor vs the rest</td><td class="py-3 px-4">35</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">virginica vs the rest</td><td class="py-3 px-4">7</td></tr>
+</tbody></table></div>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Train, then test on fresh flowers</h3>
+<p class="mb-6">
+Split: $105$ flowers to train on and $45$ fresh ones to test (never seen in training). Two models with the same recipe: straight streets and bent streets (RBF kernel).
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Model</th><th class="py-3 px-4">Train</th><th class="py-3 px-4">Test</th><th class="py-3 px-4">Wrong on test</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Linear SVM, 3 machines</td><td class="py-3 px-4">91.4%</td><td class="py-3 px-4">91.1%</td><td class="py-3 px-4">4 of 45</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">RBF SVM, 3 machines ($\gamma=1$, $C=1$)</td><td class="py-3 px-4">94.3%</td><td class="py-3 px-4">100.0%</td><td class="py-3 px-4">0 of 45</td></tr>
+</tbody></table></div>
+<div class="my-6 pl-4 border-l border-amber-500/60 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-amber-500"><span class="font-medium text-gray-800 dark:text-gray-200">Common Pitfall:</span> Only $45$ test flowers. Test above train is luck of this split, not magic. Repeat with other splits (cross-validation) to be sure.</div>
+<p class="mb-6">
+The straight streets stumble where versicolor and virginica touch. The bent streets follow the curve between them.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The whole solution in sklearn</h3>
+<pre class="my-8 p-4 rounded-lg bg-gray-100 dark:bg-white/5 overflow-x-auto no-scrollbar font-mono text-sm leading-relaxed text-gray-800 dark:text-gray-200">X, y = load_iris(return_X_y=True)
+X = X[:, 2:4]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, stratify=y, random_state=0)
+
+model = OneVsRestClassifier(SVC(kernel="rbf", gamma=1, C=1))
+model.fit(X_train, y_train)
+
+print(model.score(X_test, y_test))   # 1.0
+print(model.predict([[4.5, 1.5]]))   # [1] = versicolor</pre>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>What changes if we use all 4 flower measurements?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>Just drop the line <code>X = X[:, 2:4]</code>. Same model, more information.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Same recipe, four models</h3>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4"></th><th class="py-3 px-4">Linear</th><th class="py-3 px-4">Logistic</th><th class="py-3 px-4">Softmax</th><th class="py-3 px-4">SVM</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Output</td><td class="py-3 px-4">a number</td><td class="py-3 px-4">a probability</td><td class="py-3 px-4">N probabilities</td><td class="py-3 px-4">a side: $-1$ or $+1$</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1. Model</td><td class="py-3 px-4">line</td><td class="py-3 px-4">line + sigmoid</td><td class="py-3 px-4">N lines + softmax</td><td class="py-3 px-4">line + sign (+ kernel)</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2. Loss</td><td class="py-3 px-4">squared error</td><td class="py-3 px-4">log loss</td><td class="py-3 px-4">cross-entropy</td><td class="py-3 px-4">hinge loss</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">3. Optimize</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent*</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+*Kernel SVMs in libraries use another solver. The SVM swaps the output and the loss, and adds a kernel.
+</p>
+</section>
+
+<section id="sec-recap" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 08</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">What We Learned</h2>
+<div class="my-8 grid gap-4 font-sans sm:grid-cols-2"><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">1 &middot; Widest street</div><div class="text-sm text-gray-600 dark:text-gray-400">The best line leaves the most room on both sides.</div></div><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">2 &middot; Support vectors</div><div class="text-sm text-gray-600 dark:text-gray-400">Only the edge dots hold the line in place.</div></div><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">3 &middot; Hinge loss + $C$</div><div class="text-sm text-gray-600 dark:text-gray-400">A fine for rule breakers; $C$ is the price.</div></div><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">4 &middot; Kernel + similarity</div><div class="text-sm text-gray-600 dark:text-gray-400">Bends the line into a curve.</div></div></div>
+<p class="mb-6">
+Thank you! Questions?
+</p>
+</section>
+
+<section id="sec-glossary" class="scroll-mt-28 w-full reveal-section"><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Glossary &amp; Terminology</h2>
+<dl class="font-sans text-sm sm:text-base space-y-5"><div><dt class="font-medium text-gray-900 dark:text-gray-100">Weights $\beta$</dt><dd class="text-gray-600 dark:text-gray-400">The numbers the machine learns.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Score $f$</dt><dd class="text-gray-600 dark:text-gray-400">The machine's number for a dot.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Sign</dt><dd class="text-gray-600 dark:text-gray-400">Keep only $+$ or $-$: the side.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">$y \cdot f$</dt><dd class="text-gray-600 dark:text-gray-400">How safely a dot sits on its own side.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Street / margin</dt><dd class="text-gray-600 dark:text-gray-400">The empty band around the line. Its width is $2/\|\beta\|$.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Support vector</dt><dd class="text-gray-600 dark:text-gray-400">A dot on the edge of the street: it holds the street.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Hinge loss</dt><dd class="text-gray-600 dark:text-gray-400">Fine $=0$ if safe, grows as the dot gets near the street or crosses the line.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">$C$</dt><dd class="text-gray-600 dark:text-gray-400">The price of one unit of fine.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Kernel</dt><dd class="text-gray-600 dark:text-gray-400">The similarity of two dots, from $0$ to $1$.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">$\gamma$</dt><dd class="text-gray-600 dark:text-gray-400">How far one dot's similarity reaches.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">$\eta$</dt><dd class="text-gray-600 dark:text-gray-400">The size of one step downhill.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">RBF</dt><dd class="text-gray-600 dark:text-gray-400">The usual kernel: $\exp(-\gamma \cdot \text{distance}^2)$.</dd></div></dl>
+</section>
+
+</div>
+</main>
+
+<div class="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 font-sans max-w-[calc(100vw-2rem)]"><nav id="menuList" class="absolute bottom-full left-0 mb-3 w-[280px] max-w-[calc(100vw-2rem)] max-h-[50vh] overflow-y-auto bg-white/95 dark:bg-darkCard/95 backdrop-blur-md text-gray-700 dark:text-gray-300 rounded-xl p-2 transition-all duration-300 ease-out opacity-0 translate-y-2 scale-95 pointer-events-none shadow-2xl border border-gray-200/60 dark:border-gray-800/80"><ul class="flex flex-col space-y-1 text-sm font-normal"><li><a href="#sec-agenda" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">Agenda</a></li><li><a href="#sec-flowers" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">1. Meet the Flowers</a></li><li><a href="#sec-street" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">2. The Widest Street</a></li><li><a href="#sec-model" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">3. The Model</a></li><li><a href="#sec-loss" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">4. The Loss</a></li><li><a href="#sec-opt" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">5. Optimize</a></li><li><a href="#sec-kernel" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">6. When a Line Is Not Enough</a></li><li><a href="#sec-iris" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">7. The Full Iris Problem</a></li><li><a href="#sec-recap" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">8. What We Learned</a></li><li><a href="#sec-glossary" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">Glossary &amp; Terminology</a></li></ul></nav>
+<div id="controlBar" class="bg-white/90 dark:bg-darkCard/90 backdrop-blur-md text-gray-800 dark:text-gray-200 rounded-full px-4 sm:px-5 py-2.5 sm:py-3 shadow-2xl flex items-center gap-3 sm:gap-4 cursor-pointer hover:scale-[1.03] transition-transform duration-200 select-none border border-gray-200/60 dark:border-gray-800/80">
+            <button id="indexBtn" class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium focus:outline-none hover:opacity-80 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+                <span>Index</span>
+                <svg id="arrowIcon" class="w-2.5 h-2.5 transition-transform duration-300 ml-0.5" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 5L5 1L9 5"/>
+                </svg>
+            </button>
+            <div class="w-px h-3.5 bg-gray-200 dark:bg-white/20"></div>
+            <button id="themeToggle" class="p-1 hover:text-gray-900 dark:hover:text-white transition-colors focus:outline-none hover:rotate-12" title="Toggle Theme">
+                <svg id="sunIcon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg id="moonIcon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+            <div class="w-px h-3.5 bg-gray-200 dark:bg-white/20"></div>
+            <div class="text-xs sm:text-sm font-medium tabular-nums min-w-[3ch] text-right" id="progressDisplay">0%</div>
+        </div>
+    </div>
+
+    <script>
+        const controlBar = document.getElementById('controlBar');
+        const menuList = document.getElementById('menuList');
+        const arrowIcon = document.getElementById('arrowIcon');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const links = document.querySelectorAll('.menu-link');
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        let isOpen = false;
+
+        try {
+            if (localStorage.getItem('theme') === 'light') htmlElement.classList.remove('dark');
+        } catch (e) {}
+
+        function toggleMenu() {
+            isOpen = !isOpen;
+            if (isOpen) {
+                menuList.classList.remove('opacity-0', 'translate-y-2', 'scale-95', 'pointer-events-none');
+                arrowIcon.classList.add('rotate-180');
+            } else {
+                menuList.classList.add('opacity-0', 'translate-y-2', 'scale-95', 'pointer-events-none');
+                arrowIcon.classList.remove('rotate-180');
+            }
+        }
+
+        controlBar.addEventListener('click', (e) => {
+            if (e.target.closest('#themeToggle')) return;
+            toggleMenu();
+        });
+        document.addEventListener('click', (e) => {
+            if (!menuList.contains(e.target) && !controlBar.contains(e.target) && isOpen) toggleMenu();
+        });
+        links.forEach(link => link.addEventListener('click', () => { if (isOpen) toggleMenu(); }));
+
+        themeToggle.addEventListener('click', () => {
+            const dark = htmlElement.classList.toggle('dark');
+            try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+        });
+
+        function updateProgress() {
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            let p = docHeight > 0 ? Math.round((window.scrollY / docHeight) * 100) : 0;
+            progressDisplay.textContent = Math.max(0, Math.min(100, p)) + '%';
+        }
+        window.addEventListener('scroll', updateProgress);
+        window.addEventListener('resize', updateProgress);
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => entry.target.classList.toggle('active', entry.isIntersecting));
+        }, { root: null, rootMargin: '0px 0px -5% 0px', threshold: 0.05 });
+        document.querySelectorAll('.reveal-section').forEach(s => revealObserver.observe(s));
+
+        const menuObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const id = entry.target.getAttribute('id');
+                links.forEach(link => {
+                    const on = link.getAttribute('href') === '#' + id;
+                    ['bg-gray-100', 'dark:bg-white/10', 'font-medium', 'text-gray-900', 'dark:text-white'].forEach(c => link.classList.toggle(c, on));
+                });
+            });
+        }, { root: null, rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+        document.querySelectorAll('section[id]').forEach(s => menuObserver.observe(s));
+
+        const NS = 'http://www.w3.org/2000/svg';
+        const GREEN = '#10b981', RED = '#ef4444', AMBER = '#f59e0b';
+        function el(parent, name, attrs, text) {
+            const e = document.createElementNS(NS, name);
+            for (const k in attrs) e.setAttribute(k, attrs[k]);
+            if (text !== undefined) e.textContent = text;
+            parent.appendChild(e);
+            return e;
+        }
+        
+        const fmt = (v) => (Number.isInteger(v) ? String(v) : String(+v.toFixed(3)));
+        function Ax(svg, o) {
+            const iw = o.W - o.l - o.r, ih = o.H - o.t - o.b;
+            const sx = (v) => o.l + (v - o.x[0]) / (o.x[1] - o.x[0]) * iw;
+            const sy = (v) => o.H - o.b - (v - o.y[0]) / (o.y[1] - o.y[0]) * ih;
+            const id = 'c' + Math.random().toString(36).slice(2);
+            const defs = el(svg, 'defs', {});
+            const cp = el(defs, 'clipPath', { id });
+            el(cp, 'rect', { x: o.l, y: o.t, width: iw, height: ih });
+            el(svg, 'path', { d: 'M' + o.l + ' ' + o.t + 'V' + (o.H - o.b) + 'H' + (o.W - o.r), fill: 'none', stroke: 'currentColor', 'stroke-width': 1, opacity: 0.6 });
+            (o.xt || []).forEach(v => el(svg, 'text', { x: sx(v), y: o.H - o.b + 16, 'text-anchor': 'middle', 'font-size': 11, fill: 'currentColor' }, String(v)));
+            (o.yt || []).forEach(v => el(svg, 'text', { x: o.l - 6, y: sy(v) + 4, 'text-anchor': 'end', 'font-size': 11, fill: 'currentColor' }, String(v)));
+            if (o.xl) el(svg, 'text', { x: o.W - o.r, y: o.H - 3, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, o.xl);
+            if (o.yl) el(svg, 'text', { x: o.l + 4, y: o.t - 6, 'font-size': 12, fill: 'currentColor' }, o.yl);
+            const g = el(svg, 'g', { 'clip-path': 'url(#' + id + ')' });
+            return { sx, sy, g, svg };
+        }
+        function Curve(a, fn, x0, x1, col, w, n) {
+            n = n || 140;
+            let d = '';
+            for (let i = 0; i <= n; i++) {
+                const x = x0 + (x1 - x0) * i / n;
+                d += (i ? 'L' : 'M') + a.sx(x).toFixed(1) + ' ' + a.sy(fn(x)).toFixed(1);
+            }
+            return el(a.g, 'path', { d, fill: 'none', stroke: col, 'stroke-width': w || 2.5 });
+        }
+        function Seg(a, x1, y1, x2, y2, col, w, dash) {
+            const at = { x1: a.sx(x1), y1: a.sy(y1), x2: a.sx(x2), y2: a.sy(y2), stroke: col, 'stroke-width': w || 2, 'stroke-linecap': 'round' };
+            if (dash) at['stroke-dasharray'] = dash;
+            return el(a.g, 'line', at);
+        }
+        function Dot(a, x, y, col, r, ring) {
+            const at = { cx: a.sx(x), cy: a.sy(y), r: r || 5.5, fill: ring ? 'none' : col };
+            if (ring) { at.stroke = col; at['stroke-width'] = 2; }
+            return el(a.svg, 'circle', at);
+        }
+        function Txt(a, x, y, t, col, size, anchor) {
+            return el(a.svg, 'text', { x: a.sx(x), y: a.sy(y), fill: col || 'currentColor', 'font-size': size || 12, 'text-anchor': anchor || 'start' }, t);
+        }
+        function Wire(id, names, draw) {
+            const svg = document.getElementById(id + '-svg');
+            const ins = names.map(n => document.getElementById(id + '-' + n));
+            function run() {
+                const v = {};
+                names.forEach((n, i) => {
+                    v[n] = parseFloat(ins[i].value);
+                    const s = document.getElementById(id + '-' + n + 'v');
+                    if (s) s.textContent = fmt(v[n]);
+                });
+                svg.innerHTML = '';
+                const out = draw(v, svg);
+                const r = document.getElementById(id + '-readout');
+                if (r && typeof out === 'string') r.textContent = out;
+            }
+            ins.forEach(i => i.addEventListener('input', run));
+            run();
+        }
+
+        Wire('wsvm1', ['s'], (v, svg) => {
+            const a = Ax(svg, { W: 640, H: 270, l: 50, r: 20, t: 20, b: 34, x: [1, 7], y: [0, 2.5], xt: [1, 2, 3, 4, 5, 6, 7], yt: [0, 1, 2], xl: 'petal length (cm)', yl: 'petal width (cm)' });
+            const w = (c) => (L) => (c - 1.29 * L) / 0.82;
+            Curve(a, w(3.79 + 1 / v.s), 1, 7, AMBER, 1.8);
+            Curve(a, w(3.79 - 1 / v.s), 1, 7, AMBER, 1.8);
+            Curve(a, w(3.79), 1, 7, GREEN, 2.5);
+            Dot(a, 1.9, 0.4, '#3b82f6', 6);
+            Dot(a, 3.0, 1.1, '#ef4444', 6);
+            return 'weights x ' + fmt(v.s) + ':  ||beta|| = ' + (1.53 * v.s).toFixed(2) + ',  street width = ' + (2 / (1.53 * v.s)).toFixed(2) + ' cm';
+        });
+
+        Wire('wsvm2', ['m'], (v, svg) => {
+            const a = Ax(svg, { W: 640, H: 270, l: 50, r: 20, t: 20, b: 34, x: [-2, 3], y: [0, 4], xt: [-2, -1, 0, 1, 2, 3], yt: [0, 1, 2, 3, 4], xl: 'y * f', yl: 'fine' });
+            const hinge = (m) => Math.max(0, 1 - m), sq = (m) => (1 - m) * (1 - m), lg = (m) => Math.log(1 + Math.exp(-m));
+            Curve(a, sq, -2, 3, AMBER, 2);
+            Curve(a, lg, -2, 3, '#3b82f6', 2);
+            Curve(a, hinge, -2, 3, GREEN, 3);
+            Seg(a, v.m, 0, v.m, 4, 'currentColor', 1, '4 3');
+            Dot(a, v.m, Math.min(sq(v.m), 4), AMBER, 5);
+            Dot(a, v.m, lg(v.m), '#3b82f6', 5);
+            Dot(a, v.m, hinge(v.m), GREEN, 6);
+            Txt(a, -1.9, 3.7, 'hinge', GREEN, 13);
+            Txt(a, -0.9, 3.7, 'squared', AMBER, 13);
+            Txt(a, 0.1, 3.7, 'log loss', '#3b82f6', 13);
+            return 'y*f = ' + fmt(v.m) + ':   hinge ' + hinge(v.m).toFixed(2) + '   squared ' + sq(v.m).toFixed(2) + '   log ' + lg(v.m).toFixed(2);
+        });
+
+        Wire('wsvm3', ['t'], (v, svg) => {
+            const a = Ax(svg, { W: 640, H: 270, l: 56, r: 20, t: 20, b: 34, x: [0, 100], y: [0, 2100], xt: [0, 20, 40, 60, 80, 100], yt: [0, 1000, 2000], xl: 'temperature (C)', yl: '(t - 55)^2' });
+            Curve(a, (t) => (t - 55) * (t - 55), 0, 100, GREEN, 2.5);
+            Seg(a, 0, 162.5, 100, 162.5, '#ef4444', 2, '5 4');
+            const f = (v.t - 55) * (v.t - 55);
+            Seg(a, v.t, 0, v.t, f, AMBER, 1.5, '4 3');
+            Dot(a, v.t, f, AMBER, 6);
+            return 't = ' + v.t + ' C:  (t - 55)^2 = ' + f + '  ->  ' + (f < 162.5 ? 'below the cut 162.5: good tea' : 'above the cut 162.5: bad tea');
+        });
+
+        Wire('wsvm4', ['g', 'd'], (v, svg) => {
+            const a = Ax(svg, { W: 640, H: 270, l: 50, r: 20, t: 20, b: 34, x: [0, 3], y: [0, 1], xt: [0, 1, 2, 3], yt: [0, 0.5, 1], xl: 'distance between two dots', yl: 'similarity K' });
+            const K = (d) => Math.exp(-v.g * d * d);
+            Curve(a, K, 0, 3, GREEN, 3);
+            Seg(a, v.d, 0, v.d, K(v.d), AMBER, 1.5, '4 3');
+            Dot(a, v.d, K(v.d), AMBER, 6);
+            return 'gamma = ' + fmt(v.g) + ', distance = ' + fmt(v.d) + ', distance^2 = ' + (v.d * v.d).toFixed(2) + '  ->  K = ' + K(v.d).toFixed(3);
+        });
+
+        updateProgress();
+    </script>
+</body>
+</html>

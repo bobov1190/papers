@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>K-Nearest Neighbors: Lesson 3</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Lora', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        dark: '#121212',
+                        darkCard: '#1a1a1a',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="https://cdn-icons-png.flaticon.com/128/2541/2541979.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+    <!-- MathJax Configuration for Inline $...$ support -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* Полное устранение скроллбаров при сохранении плавной прокрутки */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Скрытие скроллбара у выпадающего меню */
+        #menuList::-webkit-scrollbar {
+            display: none;
+        }
+        #menuList {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Скрытие скроллбара в формулах и коде */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Плавное повторное появление секций при скролле */
+        .reveal-section {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Плавная анимация раскрытия аккордеона без рывков */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .accordion-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            opacity: 0;
+        }
+        details[open] .accordion-content {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+        .accordion-content > div {
+            overflow: hidden;
+        }
+
+        /* Плавные переходы для интерактивных элементов */
+        a, button, tr, details {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Минималистичный слайдер для интерактивных виджетов */
+        input[type="range"].lesson-range {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 2px;
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 2px;
+            outline: none;
+        }
+        input[type="range"].lesson-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        input[type="range"].lesson-range::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+        input[type="range"].lesson-range::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border: 0;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-[#fcfcfc] dark:bg-[#111111] text-gray-700 dark:text-gray-300 font-serif text-[1.05rem] leading-[1.8] antialiased transition-colors duration-300 selection:bg-gray-200 dark:selection:bg-gray-800">
+
+    <!-- Main Article Container -->
+    <main class="max-w-2xl mx-auto px-5 sm:px-6 py-16 sm:py-28 min-h-[200vh] w-full">
+<header class="mb-16 sm:mb-24 reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4 block">Lesson 03 &middot; Turin Polytechnic University in Tashkent</span><h1 class="font-sans text-3xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-900 dark:text-gray-100 leading-tight">K-Nearest Neighbors</h1><p class="font-sans text-lg sm:text-xl text-gray-500 dark:text-gray-400 font-normal leading-relaxed">Who is your neighbor? Ask the closest passengers. A model with no weights and no walk downhill: the model is the data, and the only things to choose are $k$ and the ruler.</p></header>
+<div class="space-y-16 sm:space-y-24 w-full">
+<section id="sec-agenda" class="scroll-mt-28 reveal-section"><h2 class="font-sans text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Agenda</h2><ol class="font-sans list-decimal pl-5 space-y-2.5 text-gray-600 dark:text-gray-400 text-sm sm:text-base"><li><a href="#sec-passengers" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Meet the Passengers</a></li><li><a href="#sec-model" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">The Model: Distance and a Vote</a></li><li><a href="#sec-loss" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">The Loss: Mistakes on Fresh Passengers</a></li><li><a href="#sec-opt" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Optimize: Choosing k</a></li><li><a href="#sec-scale" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">The Trap: Scale</a></li><li><a href="#sec-together" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Putting It Together</a></li><li><a href="#sec-recap" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">What We Learned</a></li><li><a href="#sec-glossary" class="hover:text-emerald-600 dark:hover:text-emerald-400 inline-block transition-transform hover:translate-x-1">Glossary &amp; Terminology</a></li></ol></section>
+
+<section id="sec-passengers" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 01</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Meet the Passengers</h2>
+<p class="mb-6">
+Four models, one recipe each time: <strong>model, loss, optimize</strong>. Today we ask a new question: <em>can a model work without any of these steps?</em>
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4"></th><th class="py-3 px-4">Linear</th><th class="py-3 px-4">Logistic</th><th class="py-3 px-4">Softmax</th><th class="py-3 px-4">SVM</th><th class="py-3 px-4">Today: KNN</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Output</td><td class="py-3 px-4">a number</td><td class="py-3 px-4">a probability</td><td class="py-3 px-4">N probabilities</td><td class="py-3 px-4">a side: $-1$ or $+1$</td><td class="py-3 px-4">?</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1. Model</td><td class="py-3 px-4">line</td><td class="py-3 px-4">line + sigmoid</td><td class="py-3 px-4">N lines + softmax</td><td class="py-3 px-4">line + sign (+ kernel)</td><td class="py-3 px-4">?</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2. Loss</td><td class="py-3 px-4">squared error</td><td class="py-3 px-4">log loss</td><td class="py-3 px-4">cross-entropy</td><td class="py-3 px-4">hinge loss</td><td class="py-3 px-4">?</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">3. Optimize</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent*</td><td class="py-3 px-4">?</td></tr>
+</tbody></table></div>
+<div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500"><span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> In every column the optimizer is the same walk downhill. KNN will break that pattern.</div>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Our data: Titanic passengers</h3>
+<p class="mb-6">
+The Titanic data has <strong>891 real passengers</strong>. For every one we know the age and the ticket fare. Here we look at $22$ of them, a random sample: age, fare in pounds, and the fate. $9$ of the $22$ survived and $13$ died.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Passenger</th><th class="py-3 px-4">Age</th><th class="py-3 px-4">Fare</th><th class="py-3 px-4">Fate</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">passenger 1</td><td class="py-3 px-4">29 yrs</td><td class="py-3 px-4">&pound;7.05</td><td class="py-3 px-4">died</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">passenger 2</td><td class="py-3 px-4">19 yrs</td><td class="py-3 px-4">&pound;36.75</td><td class="py-3 px-4">died</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+Each passenger is one dot on a map of age and fare. The two fates are mixed: there are no clean groups.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Intuition: ask the neighbors</h3>
+<p class="mb-6">
+You are likely to share the fate of people with a similar age and a similar ticket. Put yourself on the map (a yellow star) and look at the $k$ closest passengers. Let them vote.
+</p>
+<ul class="list-disc pl-5 mb-6 space-y-1"><li>find the passengers closest to you</li><li>keep the $k$ closest (here $k=3$)</li><li>the majority fate wins the vote</li></ul>
+<p class="mb-6">
+With $k=3$ the vote is $2$ survived against $1$ died: the answer is <strong>survived</strong>.
+</p>
+</section>
+
+<section id="sec-model" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 02</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">The Model: Distance and a Vote</h2>
+<p class="mb-6">
+There are no weights to learn. The only tool we need is the <strong>distance</strong> between two passengers. Close in age and in ticket price means a small distance.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$d(a, b) = \sqrt{\sum_{j=1}^{d} (a_j - b_j)^2}$$</div></div>
+<p class="mb-6">
+Our case, $d=2$: $d = \sqrt{(\text{age}_a-\text{age}_b)^2 + (\text{fare}_a-\text{fare}_b)^2}$. A real pair: you $=(35\text{ years}, \pounds 20)$ and passenger A $=(33, \pounds 15.85)$.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$d = \sqrt{2^2 + 4.15^2} = 4.6$$</div></div>
+<p class="mb-6">
+The age differs by $2$ years and the fare by $\pounds 4.15$: the fare gap does most of the work here.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Two passengers have the same age and the same fare. What is $d$?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>$d=0$. The closer two passengers are, the smaller $d$.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Measure it to all 22, sort, keep the closest</h3>
+<p class="mb-6">
+Step 1: the distance from you to every one of the $22$ passengers. Step 2: sort from smallest to largest. The top of the list are your neighbors.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Rank</th><th class="py-3 px-4">Age</th><th class="py-3 px-4">Fare</th><th class="py-3 px-4">Distance</th><th class="py-3 px-4">Fate</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1</td><td class="py-3 px-4">33</td><td class="py-3 px-4">&pound;15.85</td><td class="py-3 px-4">4.6</td><td class="py-3 px-4">survived</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2</td><td class="py-3 px-4">30</td><td class="py-3 px-4">&pound;16.10</td><td class="py-3 px-4">6.3</td><td class="py-3 px-4">died</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">3</td><td class="py-3 px-4">36</td><td class="py-3 px-4">&pound;13.00</td><td class="py-3 px-4">7.1</td><td class="py-3 px-4">survived</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">4</td><td class="py-3 px-4">28</td><td class="py-3 px-4">&pound;16.10</td><td class="py-3 px-4">7.6</td><td class="py-3 px-4">died</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">5</td><td class="py-3 px-4">43</td><td class="py-3 px-4">&pound;26.25</td><td class="py-3 px-4">10.2</td><td class="py-3 px-4">died</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+The other $17$ passengers are farther away.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Where is the training step? Where are the weights?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>There are none. The model <em>is</em> the passenger list, we just measure distances.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">$k$ is the number of voters</h3>
+<p class="mb-6">
+Same star, different $k$. Small $k$ listens to a few passengers, large $k$ listens to a crowd. The neighbors vote with their fates and the most common fate is the answer: no formula to fit, just count.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$\hat{y}(x) = \operatorname{mode}\big\{\, y_i : i \in N_k(x) \,\big\}$$</div></div>
+<p class="mb-6">
+Use the slider below: the five nearest passengers from the table, a plain vote, and a <strong>weighted vote</strong> where each neighbor shouts with weight $w_i = 1/d_i$ (half the distance, double the voice).
+</p>
+<figure class="my-8 font-sans" id="wknn1"><div class="grid gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400 sm:grid-cols-2"><div><label for="wknn1-k" class="whitespace-nowrap">$k$ = <span id="wknn1-kv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">3</span></label><input id="wknn1-k" type="range" min="1" max="5" step="1" value="3" class="lesson-range mt-2"></div></div><svg id="wknn1-svg" viewBox="0 0 640 250" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img"></svg><div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wknn1-readout"></div><figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">Figure 2.1 &mdash; Interactive. The $k$ nearest passengers vote. Plain vote against weighted vote $1/d$.</figcaption></figure>
+<div class="my-6 pl-4 border-l border-amber-500/60 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-amber-500"><span class="font-medium text-gray-800 dark:text-gray-200">Common Pitfall:</span> With $k=4$ the vote can be 2 against 2, a tie. That is why we like an odd $k$.</div>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>You are the same person. Why does the answer flip at $k=5$?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>Farther passengers join the vote and outvote the closest ones. $k$ is a setting we choose.</p></div></div></div></details>
+<p class="mb-6">
+Table of the weights for $k=5$: survived gets $0.217+0.141=0.358$, died gets $0.158+0.132+0.099=0.388$. The plain vote says died ($2$ against $3$) and the weighted vote also says <strong>died</strong>, with a slim $52.0\%$.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$w_i = \frac{1}{d_i}, \qquad \text{score}(c) = \sum_{i \in N_k(x)} w_i\,\mathbf{1}[y_i = c]$$</div></div>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Other rulers: Euclid and Manhattan</h3>
+<p class="mb-6">
+Distance has more than one recipe. The ruler goes straight, the taxi follows the streets.
+</p>
+<figure class="my-8 font-sans" id="wknn2"><div class="grid gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400 sm:grid-cols-2"><div><label for="wknn2-da" class="whitespace-nowrap">age gap = <span id="wknn2-dav" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">6</span></label><input id="wknn2-da" type="range" min="0" max="10" step="0.1" value="6" class="lesson-range mt-2"></div><div><label for="wknn2-df" class="whitespace-nowrap">fare gap (&pound;) = <span id="wknn2-dfv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">5.9</span></label><input id="wknn2-df" type="range" min="0" max="10" step="0.1" value="5.9" class="lesson-range mt-2"></div></div><svg id="wknn2-svg" viewBox="0 0 640 250" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img"></svg><div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wknn2-readout"></div><figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">Figure 2.2 &mdash; Interactive. The same two passengers, two different numbers. Start values: 6 years and &pound;5.9.</figcaption></figure>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$d_2(a,b) = \sqrt{\sum_j (a_j - b_j)^2} = \sqrt{6^2 + 5.9^2} = 8.4, \qquad d_1(a,b) = \sum_j |a_j - b_j| = 6 + 5.9 = 11.9$$</div></div>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Which distance is longer for the same pair?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>The taxi: it cannot cut the corner. We use the Euclid ruler unless told otherwise.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Categories: count the mismatches</h3>
+<p class="mb-6">
+Sex, class and port are words, not numbers: a ruler cannot measure &ldquo;woman minus man&rdquo;. Instead count how many answers differ. This is the <strong>Hamming distance</strong>.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$d(a,b) = \sum_{j=1}^{p} \mathbf{1}\,[\,a_j \neq b_j\,]$$</div></div>
+<p class="mb-6">
+If you and passenger P differ in only one of three answers, $d=1$; passenger Q differs in two, $d=2$, so P is the closer neighbor. (The numbers are made up to show the idea.) Do not code classes $1,2,3$ and use the ordinary ruler: it would say 1st and 3rd are twice as far as 1st and 2nd, and we cannot back that up.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Regression: average instead of vote</h3>
+<p class="mb-6">
+The same idea works for a number: how much did a passenger of age $35$ pay? Ask the closest ages. The prediction is the <strong>average</strong> of the $k$ closest passengers (distance in age only).
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$\hat{y}(x) = \frac{1}{k}\sum_{i \in N_k(x)} y_i$$</div></div>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">$k$</th><th class="py-3 px-4">Predicted fare</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1</td><td class="py-3 px-4">&pound;52.00</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">15</td><td class="py-3 px-4">&pound;28.92</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">101</td><td class="py-3 px-4">&pound;25.63</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+Small $k$ follows every dot, large $k$ gives a smooth curve.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">A lazy learner: no training step</h3>
+<p class="mb-6">
+Other models learn weights first and then answer fast. KNN does the opposite: all its work happens when a new passenger arrives.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4"></th><th class="py-3 px-4">What happens</th><th class="py-3 px-4">Cost</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200"><code>fit()</code></td><td class="py-3 px-4">store the 466 training passengers, nothing is computed</td><td class="py-3 px-4">0 steps downhill</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200"><code>predict()</code></td><td class="py-3 px-4">measure 466 distances, sort them, count the votes</td><td class="py-3 px-4">all the work is here</td></tr>
+</tbody></table></div>
+<div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500"><span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> A lazy learner is cheap to build and expensive to ask: a million passengers means a million distances per question.</div>
+</section>
+
+<section id="sec-loss" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 03</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">The Loss: Mistakes on Fresh Passengers</h2>
+<p class="mb-6">
+KNN has nothing to push down, but we still must <em>score</em> it. Split all $666$ passengers (age and fare known): $466$ stay in the list and $200$ are fresh passengers the list never saw. The loss is the share of fresh passengers we get wrong.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$L = \frac{1}{n}\sum_{i=1}^{n} \mathbf{1}\,[\,\hat{y}_i \neq y_i\,]$$</div></div>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Fresh passenger</th><th class="py-3 px-4">Fare</th><th class="py-3 px-4">Truth</th><th class="py-3 px-4">Prediction</th><th class="py-3 px-4">Loss</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">21 yrs</td><td class="py-3 px-4">&pound;8.66</td><td class="py-3 px-4">died</td><td class="py-3 px-4">died</td><td class="py-3 px-4">0</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">27 yrs</td><td class="py-3 px-4">&pound;13.00</td><td class="py-3 px-4">died</td><td class="py-3 px-4">survived</td><td class="py-3 px-4">1</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">23 yrs</td><td class="py-3 px-4">&pound;7.85</td><td class="py-3 px-4">died</td><td class="py-3 px-4">died</td><td class="py-3 px-4">0</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">50 yrs</td><td class="py-3 px-4">&pound;26.00</td><td class="py-3 px-4">survived</td><td class="py-3 px-4">died</td><td class="py-3 px-4">1</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">18 yrs</td><td class="py-3 px-4">&pound;13.00</td><td class="py-3 px-4">survived</td><td class="py-3 px-4">died</td><td class="py-3 px-4">1</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+Our case ($k=5$, age and fare): wrong on $79$ of $200$ fresh passengers, so $L = 79/200 = 0.395$.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>So which number do we report?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>The test one, on passengers the list has never seen.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Why not score on the same passengers?</h3>
+<p class="mb-6">
+Ask a passenger from the list: his nearest neighbor is himself, at distance $0$. With $k=1$ the answer is almost always right, and that tells us nothing about a new passenger.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">$k=1$</th><th class="py-3 px-4">Accuracy</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">on the list (train)</td><td class="py-3 px-4">97.4%</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">on fresh passengers (test)</td><td class="py-3 px-4">62.0%</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+Train is not exactly $100\%$: two passengers with the same age and fare can have different fates. <strong>Train accuracy rewards memory. Test accuracy rewards understanding.</strong>
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Beat the dumbest model first</h3>
+<p class="mb-6">
+The dumbest model ignores the passenger and always says &ldquo;died&rdquo; ($62$ of $100$ died). Any real model must score above it on fresh passengers.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Model</th><th class="py-3 px-4">Test accuracy</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">always say &ldquo;died&rdquo;</td><td class="py-3 px-4">62.0%</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">KNN, $k=1$</td><td class="py-3 px-4">62.0%</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">KNN, $k=5$</td><td class="py-3 px-4">60.5%</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">KNN, $k=19$</td><td class="py-3 px-4">70.5%</td></tr>
+</tbody></table></div>
+<div class="my-6 pl-4 border-l border-amber-500/60 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-amber-500"><span class="font-medium text-gray-800 dark:text-gray-200">Common Pitfall:</span> Age and fare alone are weak signals: even the best $k$ beats the dumb model by only a few points. A score of $62\%$ is not good by itself.</div>
+</section>
+
+<section id="sec-opt" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 04</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Optimize: Choosing k</h2>
+<p class="mb-6">
+There is no walk downhill. We try several $k$ and compare them. Start with three maps of the same $466$ passengers: the background is what the list would answer there.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">$k$</th><th class="py-3 px-4">Map</th><th class="py-3 px-4">Train</th><th class="py-3 px-4">Test</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1</td><td class="py-3 px-4">too jumpy</td><td class="py-3 px-4">97.4%</td><td class="py-3 px-4">62.0%</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">19</td><td class="py-3 px-4">just right</td><td class="py-3 px-4">71.9%</td><td class="py-3 px-4">70.5%</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">101</td><td class="py-3 px-4">too smooth</td><td class="py-3 px-4">66.3%</td><td class="py-3 px-4">59.5%</td></tr>
+</tbody></table></div>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Which map would you trust with a new passenger?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>The middle one. $k=1$ memorizes noise, $k=101$ ignores the neighborhood.</p></div></div></div></details>
+<p class="mb-6">
+We measure the accuracy on the list and on fresh passengers for every odd $k$ from $1$ to $101$. At $k=1$ every passenger votes for himself: train $97\%$, test $62\%$, memorizing. At $k=101$ both fall: too smooth, no details left.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Cross-validation: rotate the fresh passengers</h3>
+<p class="mb-6">
+The test set is for the final exam only. To choose $k$ we need <em>practice exams</em>. Cut the $466$ training passengers into $5$ parts. Each part is the fresh part once (here $k=19$).
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Round</th><th class="py-3 px-4">1</th><th class="py-3 px-4">2</th><th class="py-3 px-4">3</th><th class="py-3 px-4">4</th><th class="py-3 px-4">5</th><th class="py-3 px-4">Mean</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Accuracy</td><td class="py-3 px-4">69.1%</td><td class="py-3 px-4">73.1%</td><td class="py-3 px-4">69.9%</td><td class="py-3 px-4">64.5%</td><td class="py-3 px-4">63.4%</td><td class="py-3 px-4">68.0%</td></tr>
+</tbody></table></div>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Why not just pick the $k$ with the best test accuracy?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>Then the test set is no longer fresh. We would be fitting $k$ to the exam.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Try, compare, keep the best</h3>
+<p class="mb-6">
+Repeat the rotation for each candidate $k$. This is KNN&rsquo;s &ldquo;optimization&rdquo;: a <em>search</em>, not a walk. A rule of thumb: start near $\sqrt{n}$ (here about $22$) and use an odd $k$.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">$k$</th><th class="py-3 px-4">1</th><th class="py-3 px-4">5</th><th class="py-3 px-4">11</th><th class="py-3 px-4">19</th><th class="py-3 px-4">31</th><th class="py-3 px-4">61</th><th class="py-3 px-4">101</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">CV accuracy</td><td class="py-3 px-4">64.4%</td><td class="py-3 px-4">66.1%</td><td class="py-3 px-4">67.4%</td><td class="py-3 px-4">68.0%</td><td class="py-3 px-4">66.1%</td><td class="py-3 px-4">67.0%</td><td class="py-3 px-4">67.2%</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+Winner: $k=19$ with CV $68.0\%$. The final exam gives test $70.5\%$.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>How do we know the winner is not just luck?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>We do not, fully. Nearby $k$ differ by about a point, which is within the noise.</p></div></div></div></details>
+</section>
+
+<section id="sec-scale" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 05</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">The Trap: Scale</h2>
+<p class="mb-6">
+The ruler listens to the loudest number. Women and men survived very differently, so add a third measurement: woman $=1$, man $=0$. KNN just adds one more term under the square root.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4"></th><th class="py-3 px-4">Age</th><th class="py-3 px-4">Fare</th><th class="py-3 px-4">Sex</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">you</td><td class="py-3 px-4">35 yrs</td><td class="py-3 px-4">&pound;20</td><td class="py-3 px-4">1 (woman)</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">passenger P</td><td class="py-3 px-4">41 yrs</td><td class="py-3 px-4">&pound;14.11</td><td class="py-3 px-4">0 (man)</td></tr>
+</tbody></table></div>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$d^2 = 6^2 + 5.9^2 + 1^2 = 71.7$$</div></div>
+<p class="mb-6">
+Share of $d^2$ for this pair: age $50\%$, fare $48\%$, sex $1.4\%$. Over <em>all</em> pairs of passengers it is worse: age $33\%$, fare $67\%$, sex only $0.04\%$.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Sex changes $d^2$ by only 1. Does KNN even notice it?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>Almost never. Age and fare are measured in tens, so the $0/1$ column is a whisper.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">The fix: the same scale for every feature</h3>
+<p class="mb-6">
+Subtract the average, divide by the spread. Every column gets mean $0$ and spread $1$. This is what <code>StandardScaler</code> does. The ruler then hears all features equally.
+</p>
+<div class="my-8 w-full overflow-x-auto no-scrollbar py-2"><div class="text-center text-sm sm:text-base max-w-full text-gray-900 dark:text-gray-100">$$z = \frac{x - \mu}{\sigma}$$</div></div>
+<figure class="my-8 font-sans" id="wknn3"><div class="grid gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400 sm:grid-cols-2"><div><label for="wknn3-age" class="whitespace-nowrap">age = <span id="wknn3-agev" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">35</span></label><input id="wknn3-age" type="range" min="1" max="80" step="1" value="35" class="lesson-range mt-2"></div><div><label for="wknn3-fare" class="whitespace-nowrap">fare (&pound;) = <span id="wknn3-farev" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">20</span></label><input id="wknn3-fare" type="range" min="0" max="100" step="1" value="20" class="lesson-range mt-2"></div><div><label for="wknn3-sex" class="whitespace-nowrap">sex (1 = woman) = <span id="wknn3-sexv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">1</span></label><input id="wknn3-sex" type="range" min="0" max="1" step="1" value="1" class="lesson-range mt-2"></div></div><svg id="wknn3-svg" viewBox="0 0 640 220" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img"></svg><div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wknn3-readout"></div><figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">Figure 5.1 &mdash; Interactive. Scaling with the real averages and spreads of our passengers (age $30.15 \pm 14.32$, fare $23.51 \pm 21.02$, sex $0.35 \pm 0.48$).</figcaption></figure>
+<p class="mb-6">
+For you: age $z = (35-30.15)/14.32 = +0.34$, fare $z=-0.17$, sex $z=+1.36$. After scaling, the average and the spread of every column are $0$ and $1$: age, fare and sex speak at the same volume.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Before and after scaling</h3>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4"></th><th class="py-3 px-4">Raw numbers</th><th class="py-3 px-4">Scaled numbers</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">share of age / fare / sex</td><td class="py-3 px-4">33% / 67% / 0.04%</td><td class="py-3 px-4">34% / 33% / 33%</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">best $k$ (by CV)</td><td class="py-3 px-4">5</td><td class="py-3 px-4">23</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">test accuracy</td><td class="py-3 px-4">65.5%</td><td class="py-3 px-4">76.0%</td></tr>
+</tbody></table></div>
+<p class="mb-6">
+Only the ruler changed. Test accuracy went $65.5\% \to 76.0\%$. One split of $200$ is noisy, but cross-validation agrees: $69.7\% \to 78.8\%$.
+</p>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Useless columns blur the neighbors</h3>
+<p class="mb-6">
+Add columns of pure random noise to the real ones. Every extra column adds distance but no information, so the neighbors stop being close: accuracy falls and &ldquo;near&rdquo; and &ldquo;far&rdquo; start to look the same. This is the <strong>curse of dimensionality</strong>. Try a simulation: random points, how close is the nearest one compared with an average one?
+</p>
+<figure class="my-8 font-sans" id="wknn4"><div class="grid gap-3 mb-3 text-sm text-gray-600 dark:text-gray-400 sm:grid-cols-2"><div><label for="wknn4-d" class="whitespace-nowrap">number of columns = <span id="wknn4-dv" class="font-medium text-gray-900 dark:text-gray-100 tabular-nums">3</span></label><input id="wknn4-d" type="range" min="1" max="100" step="1" value="3" class="lesson-range mt-2"></div></div><svg id="wknn4-svg" viewBox="0 0 640 250" class="w-full h-auto text-gray-500 dark:text-gray-400" role="img"></svg><div class="mt-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums" id="wknn4-readout"></div><figcaption class="mt-3 text-center text-xs text-gray-400 dark:text-gray-500">Figure 5.2 &mdash; Live simulation (200 random points in the unit cube, 15 queries). Nearest distance divided by average distance, as the number of columns grows.</figcaption></figure>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Why do the nearest neighbors stop being near?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>With many columns every passenger is far from every other one.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Speed: cut the map in halves</h3>
+<p class="mb-6">
+Measuring all $n$ distances is slow for a big list. A <strong>KD-tree</strong> cuts the map into boxes first: cut by age at the middle passenger, cut each half by fare, and so on. To find your neighbors, look only in the boxes near the star. On our sample that is $13$ distances instead of $22$, and the gain grows with the list: roughly $\log n$ boxes instead of $n$.
+</p>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Does the tree change the answer?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>No. Same neighbors, found faster. It works best with few columns, not hundreds.</p></div></div></div></details>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">Strengths and weaknesses</h3>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4">Strengths</th><th class="py-3 px-4">Weaknesses</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">No training step: new data is simply added to the list</td><td class="py-3 px-4">$k=1$ memorizes: train 97.4%, test only 62.0%</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">One main setting, $k$, chosen by cross-validation</td><td class="py-3 px-4">Raw numbers: the big scale shouts. Scaling lifted the test from 65.5% to 76.0%</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Bends around any shape of border</td><td class="py-3 px-4">Every prediction measures all distances (22 here, 13 with a KD-tree)</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Works for classes (vote) and numbers (average)</td><td class="py-3 px-4">Useless columns blur the neighbors</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="sec-together" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 06</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Putting It Together</h2>
+<p class="mb-6">
+Same recipe, five models. KNN fills the &ldquo;?&rdquo; in a very different way: its &ldquo;model&rdquo; is the data, its &ldquo;loss&rdquo; is a count, its &ldquo;optimizer&rdquo; is a search over $k$.
+</p>
+<div class="my-8 overflow-x-auto no-scrollbar font-sans text-sm"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-200 dark:border-gray-800 text-gray-900 dark:text-gray-100 font-medium"><th class="py-3 pr-4"></th><th class="py-3 px-4">Linear</th><th class="py-3 px-4">Logistic</th><th class="py-3 px-4">Softmax</th><th class="py-3 px-4">SVM</th><th class="py-3 px-4">KNN</th></tr></thead><tbody class="divide-y divide-gray-100 dark:divide-gray-900 text-gray-600 dark:text-gray-400"><tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">Output</td><td class="py-3 px-4">a number</td><td class="py-3 px-4">a probability</td><td class="py-3 px-4">N probabilities</td><td class="py-3 px-4">a side: $-1$ or $+1$</td><td class="py-3 px-4">a fate (vote)</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">1. Model</td><td class="py-3 px-4">line</td><td class="py-3 px-4">line + sigmoid</td><td class="py-3 px-4">N lines + softmax</td><td class="py-3 px-4">line + sign (+ kernel)</td><td class="py-3 px-4">the passenger list</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">2. Loss</td><td class="py-3 px-4">squared error</td><td class="py-3 px-4">log loss</td><td class="py-3 px-4">cross-entropy</td><td class="py-3 px-4">hinge loss</td><td class="py-3 px-4">mistakes on fresh data</td></tr>
+<tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02]"><td class="py-3 pr-4 font-medium text-gray-800 dark:text-gray-200">3. Optimize</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent</td><td class="py-3 px-4">gradient descent*</td><td class="py-3 px-4">try $k$, compare (CV)</td></tr>
+</tbody></table></div>
+<div class="my-6 pl-4 border-l border-gray-300 dark:border-gray-700 font-sans text-sm sm:text-base text-gray-500 dark:text-gray-400 transition-colors hover:border-gray-500"><span class="font-medium text-gray-800 dark:text-gray-200">Intuition Check:</span> No weights and no walk downhill. The only &ldquo;learning&rdquo; is choosing $k$, and scaling the ruler.</div>
+<h3 class="font-sans text-lg font-semibold mt-12 mb-4 text-gray-900 dark:text-gray-100">All of it in five lines of sklearn</h3>
+<p class="mb-6">
+The scaler and KNN live in one pipeline, so scaling is learned only from the training list. <code>cross_val_score</code> picks $k$, the $200$ fresh passengers give the final exam.
+</p>
+<pre class="my-8 p-4 rounded-lg bg-gray-100 dark:bg-white/5 overflow-x-auto no-scrollbar font-mono text-sm leading-relaxed text-gray-800 dark:text-gray-200">from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+
+model = make_pipeline(StandardScaler(), KNeighborsClassifier(23))
+model.fit(X_train, y_train)      # just stores the list
+model.score(X_test, y_test)      # distances happen here
+
+# test accuracy 76.0% (k = 23, age + fare + sex, scaled)</pre>
+<details class="group my-8 py-3 border-y border-gray-200 dark:border-gray-800/80 font-sans transition-colors"><summary class="cursor-pointer font-medium text-gray-800 dark:text-gray-200 flex items-center justify-between select-none hover:text-gray-900 dark:hover:text-white transition-colors text-base"><span>Why is the scaler inside the pipeline?</span><svg class="w-4 h-4 text-gray-400 transition-transform duration-300 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg></summary><div class="accordion-content"><div><div class="mt-4 pt-2 text-base space-y-4 font-serif text-gray-700 dark:text-gray-300"><p>So the test passengers never influence the average and spread used for scaling.</p></div></div></div></details>
+</section>
+
+<section id="sec-recap" class="scroll-mt-28 w-full reveal-section"><span class="font-sans text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Chapter 07</span><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">What We Learned</h2>
+<div class="my-8 grid gap-4 font-sans sm:grid-cols-2"><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">1 &middot; The model is the data</div><div class="text-sm text-gray-600 dark:text-gray-400">No weights, no training: <code>fit()</code> only stores the list.</div></div><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">2 &middot; $k$ is the one big setting</div><div class="text-sm text-gray-600 dark:text-gray-400">$k=1$ memorizes (train 97%, test 62%), a huge $k$ forgets the details.</div></div><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">3 &middot; Scale the ruler</div><div class="text-sm text-gray-600 dark:text-gray-400">Raw numbers: 65.5%. Scaled: 76.0%. Same data, same $k$ search.</div></div><div class="p-5 rounded-xl border border-gray-200 dark:border-gray-800"><div class="text-xs uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">4 &middot; Beat the dumbest model</div><div class="text-sm text-gray-600 dark:text-gray-400">&ldquo;Always died&rdquo; scores 62%. Compare every score with it.</div></div></div>
+<p class="mb-6">
+Thank you! Questions?
+</p>
+</section>
+
+<section id="sec-glossary" class="scroll-mt-28 w-full reveal-section"><h2 class="font-sans text-2xl sm:text-3xl font-semibold mb-6 text-gray-900 dark:text-gray-100 tracking-tight">Glossary &amp; Terminology</h2>
+<dl class="font-sans text-sm sm:text-base space-y-5"><div><dt class="font-medium text-gray-900 dark:text-gray-100">Neighbor</dt><dd class="text-gray-600 dark:text-gray-400">One of the $k$ training examples closest to the new one.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">$k$</dt><dd class="text-gray-600 dark:text-gray-400">The number of voters. Our one big setting.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Distance</dt><dd class="text-gray-600 dark:text-gray-400">How far apart two examples are. Euclid goes straight, Manhattan follows the streets.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Hamming distance</dt><dd class="text-gray-600 dark:text-gray-400">For categories: count how many answers differ.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Weighted vote</dt><dd class="text-gray-600 dark:text-gray-400">Closer neighbors count more: weight $1/d$.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Lazy learner</dt><dd class="text-gray-600 dark:text-gray-400">No training step: all the work happens at prediction time.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Fresh passengers / test set</dt><dd class="text-gray-600 dark:text-gray-400">Examples the list never saw. The honest exam.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Cross-validation</dt><dd class="text-gray-600 dark:text-gray-400">Rotate which part of the training list is the fresh part. Used to choose $k$.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">StandardScaler</dt><dd class="text-gray-600 dark:text-gray-400">Subtract the average, divide by the spread, for every column.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">Curse of dimensionality</dt><dd class="text-gray-600 dark:text-gray-400">With many columns every point is far from every other one.</dd></div><div><dt class="font-medium text-gray-900 dark:text-gray-100">KD-tree</dt><dd class="text-gray-600 dark:text-gray-400">Cut the map into boxes so we only search the boxes near the new point.</dd></div></dl>
+</section>
+
+</div>
+</main>
+
+<div class="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-50 font-sans max-w-[calc(100vw-2rem)]"><nav id="menuList" class="absolute bottom-full left-0 mb-3 w-[280px] max-w-[calc(100vw-2rem)] max-h-[50vh] overflow-y-auto bg-white/95 dark:bg-darkCard/95 backdrop-blur-md text-gray-700 dark:text-gray-300 rounded-xl p-2 transition-all duration-300 ease-out opacity-0 translate-y-2 scale-95 pointer-events-none shadow-2xl border border-gray-200/60 dark:border-gray-800/80"><ul class="flex flex-col space-y-1 text-sm font-normal"><li><a href="#sec-agenda" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">Agenda</a></li><li><a href="#sec-passengers" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">1. Meet the Passengers</a></li><li><a href="#sec-model" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">2. The Model: Distance and a Vote</a></li><li><a href="#sec-loss" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">3. The Loss: Mistakes on Fresh Passengers</a></li><li><a href="#sec-opt" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">4. Optimize: Choosing k</a></li><li><a href="#sec-scale" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">5. The Trap: Scale</a></li><li><a href="#sec-together" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">6. Putting It Together</a></li><li><a href="#sec-recap" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">7. What We Learned</a></li><li><a href="#sec-glossary" class="menu-link block px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors truncate">Glossary &amp; Terminology</a></li></ul></nav>
+<div id="controlBar" class="bg-white/90 dark:bg-darkCard/90 backdrop-blur-md text-gray-800 dark:text-gray-200 rounded-full px-4 sm:px-5 py-2.5 sm:py-3 shadow-2xl flex items-center gap-3 sm:gap-4 cursor-pointer hover:scale-[1.03] transition-transform duration-200 select-none border border-gray-200/60 dark:border-gray-800/80">
+            <button id="indexBtn" class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium focus:outline-none hover:opacity-80 transition-opacity">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+                <span>Index</span>
+                <svg id="arrowIcon" class="w-2.5 h-2.5 transition-transform duration-300 ml-0.5" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 5L5 1L9 5"/>
+                </svg>
+            </button>
+            <div class="w-px h-3.5 bg-gray-200 dark:bg-white/20"></div>
+            <button id="themeToggle" class="p-1 hover:text-gray-900 dark:hover:text-white transition-colors focus:outline-none hover:rotate-12" title="Toggle Theme">
+                <svg id="sunIcon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg id="moonIcon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+            <div class="w-px h-3.5 bg-gray-200 dark:bg-white/20"></div>
+            <div class="text-xs sm:text-sm font-medium tabular-nums min-w-[3ch] text-right" id="progressDisplay">0%</div>
+        </div>
+    </div>
+
+    <script>
+        const controlBar = document.getElementById('controlBar');
+        const menuList = document.getElementById('menuList');
+        const arrowIcon = document.getElementById('arrowIcon');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const links = document.querySelectorAll('.menu-link');
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        let isOpen = false;
+
+        try {
+            if (localStorage.getItem('theme') === 'light') htmlElement.classList.remove('dark');
+        } catch (e) {}
+
+        function toggleMenu() {
+            isOpen = !isOpen;
+            if (isOpen) {
+                menuList.classList.remove('opacity-0', 'translate-y-2', 'scale-95', 'pointer-events-none');
+                arrowIcon.classList.add('rotate-180');
+            } else {
+                menuList.classList.add('opacity-0', 'translate-y-2', 'scale-95', 'pointer-events-none');
+                arrowIcon.classList.remove('rotate-180');
+            }
+        }
+
+        controlBar.addEventListener('click', (e) => {
+            if (e.target.closest('#themeToggle')) return;
+            toggleMenu();
+        });
+        document.addEventListener('click', (e) => {
+            if (!menuList.contains(e.target) && !controlBar.contains(e.target) && isOpen) toggleMenu();
+        });
+        links.forEach(link => link.addEventListener('click', () => { if (isOpen) toggleMenu(); }));
+
+        themeToggle.addEventListener('click', () => {
+            const dark = htmlElement.classList.toggle('dark');
+            try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) {}
+        });
+
+        function updateProgress() {
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            let p = docHeight > 0 ? Math.round((window.scrollY / docHeight) * 100) : 0;
+            progressDisplay.textContent = Math.max(0, Math.min(100, p)) + '%';
+        }
+        window.addEventListener('scroll', updateProgress);
+        window.addEventListener('resize', updateProgress);
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => entry.target.classList.toggle('active', entry.isIntersecting));
+        }, { root: null, rootMargin: '0px 0px -5% 0px', threshold: 0.05 });
+        document.querySelectorAll('.reveal-section').forEach(s => revealObserver.observe(s));
+
+        const menuObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const id = entry.target.getAttribute('id');
+                links.forEach(link => {
+                    const on = link.getAttribute('href') === '#' + id;
+                    ['bg-gray-100', 'dark:bg-white/10', 'font-medium', 'text-gray-900', 'dark:text-white'].forEach(c => link.classList.toggle(c, on));
+                });
+            });
+        }, { root: null, rootMargin: '-20% 0px -60% 0px', threshold: 0 });
+        document.querySelectorAll('section[id]').forEach(s => menuObserver.observe(s));
+
+        const NS = 'http://www.w3.org/2000/svg';
+        const GREEN = '#10b981', RED = '#ef4444', AMBER = '#f59e0b';
+        function el(parent, name, attrs, text) {
+            const e = document.createElementNS(NS, name);
+            for (const k in attrs) e.setAttribute(k, attrs[k]);
+            if (text !== undefined) e.textContent = text;
+            parent.appendChild(e);
+            return e;
+        }
+        
+        const fmt = (v) => (Number.isInteger(v) ? String(v) : String(+v.toFixed(3)));
+        function Ax(svg, o) {
+            const iw = o.W - o.l - o.r, ih = o.H - o.t - o.b;
+            const sx = (v) => o.l + (v - o.x[0]) / (o.x[1] - o.x[0]) * iw;
+            const sy = (v) => o.H - o.b - (v - o.y[0]) / (o.y[1] - o.y[0]) * ih;
+            const id = 'c' + Math.random().toString(36).slice(2);
+            const defs = el(svg, 'defs', {});
+            const cp = el(defs, 'clipPath', { id });
+            el(cp, 'rect', { x: o.l, y: o.t, width: iw, height: ih });
+            el(svg, 'path', { d: 'M' + o.l + ' ' + o.t + 'V' + (o.H - o.b) + 'H' + (o.W - o.r), fill: 'none', stroke: 'currentColor', 'stroke-width': 1, opacity: 0.6 });
+            (o.xt || []).forEach(v => el(svg, 'text', { x: sx(v), y: o.H - o.b + 16, 'text-anchor': 'middle', 'font-size': 11, fill: 'currentColor' }, String(v)));
+            (o.yt || []).forEach(v => el(svg, 'text', { x: o.l - 6, y: sy(v) + 4, 'text-anchor': 'end', 'font-size': 11, fill: 'currentColor' }, String(v)));
+            if (o.xl) el(svg, 'text', { x: o.W - o.r, y: o.H - 3, 'text-anchor': 'end', 'font-size': 12, fill: 'currentColor' }, o.xl);
+            if (o.yl) el(svg, 'text', { x: o.l + 4, y: o.t - 6, 'font-size': 12, fill: 'currentColor' }, o.yl);
+            const g = el(svg, 'g', { 'clip-path': 'url(#' + id + ')' });
+            return { sx, sy, g, svg };
+        }
+        function Curve(a, fn, x0, x1, col, w, n) {
+            n = n || 140;
+            let d = '';
+            for (let i = 0; i <= n; i++) {
+                const x = x0 + (x1 - x0) * i / n;
+                d += (i ? 'L' : 'M') + a.sx(x).toFixed(1) + ' ' + a.sy(fn(x)).toFixed(1);
+            }
+            return el(a.g, 'path', { d, fill: 'none', stroke: col, 'stroke-width': w || 2.5 });
+        }
+        function Seg(a, x1, y1, x2, y2, col, w, dash) {
+            const at = { x1: a.sx(x1), y1: a.sy(y1), x2: a.sx(x2), y2: a.sy(y2), stroke: col, 'stroke-width': w || 2, 'stroke-linecap': 'round' };
+            if (dash) at['stroke-dasharray'] = dash;
+            return el(a.g, 'line', at);
+        }
+        function Dot(a, x, y, col, r, ring) {
+            const at = { cx: a.sx(x), cy: a.sy(y), r: r || 5.5, fill: ring ? 'none' : col };
+            if (ring) { at.stroke = col; at['stroke-width'] = 2; }
+            return el(a.svg, 'circle', at);
+        }
+        function Txt(a, x, y, t, col, size, anchor) {
+            return el(a.svg, 'text', { x: a.sx(x), y: a.sy(y), fill: col || 'currentColor', 'font-size': size || 12, 'text-anchor': anchor || 'start' }, t);
+        }
+        function Wire(id, names, draw) {
+            const svg = document.getElementById(id + '-svg');
+            const ins = names.map(n => document.getElementById(id + '-' + n));
+            function run() {
+                const v = {};
+                names.forEach((n, i) => {
+                    v[n] = parseFloat(ins[i].value);
+                    const s = document.getElementById(id + '-' + n + 'v');
+                    if (s) s.textContent = fmt(v[n]);
+                });
+                svg.innerHTML = '';
+                const out = draw(v, svg);
+                const r = document.getElementById(id + '-readout');
+                if (r && typeof out === 'string') r.textContent = out;
+            }
+            ins.forEach(i => i.addEventListener('input', run));
+            run();
+        }
+
+        Wire('wknn1', ['k'], (v, svg) => {
+            const nb = [['A', 33, 15.85, 1, 4.6], ['B', 30, 16.10, 0, 6.3], ['C', 36, 13.00, 1, 7.1], ['D', 28, 16.10, 0, 7.6], ['E', 43, 26.25, 0, 10.2]];
+            const a = Ax(svg, { W: 640, H: 250, l: 50, r: 20, t: 20, b: 34, x: [24, 46], y: [10, 30], xt: [25, 30, 35, 40, 45], yt: [10, 15, 20, 25, 30], xl: 'age (years)', yl: 'fare' });
+            let sv = 0, di = 0, ws = 0, wd = 0;
+            nb.forEach((p, i) => {
+                const on = i < v.k;
+                if (on) { if (p[3]) { sv++; ws += 1 / p[4]; } else { di++; wd += 1 / p[4]; } }
+                Dot(a, p[1], p[2], p[3] ? '#3b82f6' : AMBER, on ? 7 : 4);
+                if (on) Dot(a, p[1], p[2], 'currentColor', 11, true);
+                Txt(a, p[1] + 0.5, p[2] + 0.9, p[0], 'currentColor', 12);
+            });
+            const s = Dot(a, 35, 20, '#facc15', 8);
+            Txt(a, 35.6, 20.9, 'you', 'currentColor', 12);
+            return 'k = ' + v.k + ':  plain vote ' + sv + ' survived / ' + di + ' died -> ' + (sv === di ? 'tie' : sv > di ? 'survived' : 'died') + '     weighted ' + ws.toFixed(3) + ' vs ' + wd.toFixed(3) + ' -> ' + (ws > wd ? 'survived' : 'died');
+        });
+
+        Wire('wknn2', ['da', 'df'], (v, svg) => {
+            const m = Math.max(v.da, v.df, 4) * 1.15;
+            const a = Ax(svg, { W: 640, H: 250, l: 50, r: 20, t: 20, b: 34, x: [0, m * 2.2], y: [0, m], xt: [], yt: [], xl: 'age gap', yl: 'fare gap' });
+            Seg(a, 0, 0, v.da, 0, '#3b82f6', 3);
+            Seg(a, v.da, 0, v.da, v.df, '#3b82f6', 3);
+            Seg(a, 0, 0, v.da, v.df, GREEN, 3);
+            Dot(a, 0, 0, 'currentColor', 5);
+            Dot(a, v.da, v.df, 'currentColor', 5);
+            Txt(a, v.da / 2, -0.08 * m, 'taxi: ' + fmt(v.da) + ' + ' + fmt(v.df), '#3b82f6', 12, 'middle');
+            return 'Euclid (ruler) = ' + Math.hypot(v.da, v.df).toFixed(1) + '     Manhattan (taxi) = ' + (v.da + v.df).toFixed(1);
+        });
+
+        Wire('wknn3', ['age', 'fare', 'sex'], (v, svg) => {
+            const z = [(v.age - 30.15) / 14.32, (v.fare - 23.51) / 21.02, (v.sex - 0.35) / 0.48];
+            const names = ['age', 'fare', 'sex'], cols = ['#3b82f6', GREEN, AMBER];
+            const a = Ax(svg, { W: 640, H: 220, l: 70, r: 20, t: 20, b: 30, x: [-3, 3], y: [0, 3], xt: [-3, -2, -1, 0, 1, 2, 3], yt: [], xl: 'z', yl: '' });
+            Seg(a, 0, 0, 0, 3, 'currentColor', 1, '3 3');
+            z.forEach((zz, i) => {
+                const y = 2.5 - i;
+                Seg(a, 0, y, Math.max(-3, Math.min(3, zz)), y, cols[i], 12);
+                Txt(a, -3.1, y - 0.12, names[i], cols[i], 13, 'end');
+                Txt(a, Math.max(-3, Math.min(3, zz)) + (zz >= 0 ? 0.1 : -0.1), y - 0.12, (zz >= 0 ? '+' : '') + zz.toFixed(2), 'currentColor', 12, zz >= 0 ? 'start' : 'end');
+            });
+            return 'z-scores:  age ' + z[0].toFixed(2) + '   fare ' + z[1].toFixed(2) + '   sex ' + z[2].toFixed(2);
+        });
+
+        (function () {
+            let st = 12345;
+            const rnd = () => { st |= 0; st = st + 0x6D2B79F5 | 0; let t = Math.imul(st ^ st >>> 15, 1 | st); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+            const dims = [1, 2, 3, 5, 8, 12, 20, 30, 50, 75, 100];
+            const ratio = (d) => {
+                const n = 200, q = 15, P = [];
+                for (let i = 0; i < n + q; i++) { const p = []; for (let j = 0; j < d; j++) p.push(rnd()); P.push(p); }
+                let sum = 0;
+                for (let i = n; i < n + q; i++) {
+                    let mn = Infinity, tot = 0;
+                    for (let j = 0; j < n; j++) {
+                        let s = 0;
+                        for (let c = 0; c < d; c++) { const dd = P[i][c] - P[j][c]; s += dd * dd; }
+                        const r = Math.sqrt(s);
+                        tot += r; if (r < mn) mn = r;
+                    }
+                    sum += mn / (tot / n);
+                }
+                return sum / q;
+            };
+            const vals = dims.map(ratio);
+            const interp = (d) => {
+                for (let i = 1; i < dims.length; i++) if (d <= dims[i]) { const t = (d - dims[i - 1]) / (dims[i] - dims[i - 1]); return vals[i - 1] + t * (vals[i] - vals[i - 1]); }
+                return vals[vals.length - 1];
+            };
+            Wire('wknn4', ['d'], (v, svg) => {
+                const a = Ax(svg, { W: 640, H: 250, l: 50, r: 20, t: 20, b: 34, x: [0, 100], y: [0, 1], xt: [0, 25, 50, 75, 100], yt: [0, 0.5, 1], xl: 'number of columns', yl: 'nearest / average distance' });
+                let d = ''; dims.forEach((x, i) => { d += (i ? 'L' : 'M') + a.sx(x).toFixed(1) + ' ' + a.sy(vals[i]).toFixed(1); });
+                el(a.g, 'path', { d, fill: 'none', stroke: GREEN, 'stroke-width': 2.5 });
+                dims.forEach((x, i) => Dot(a, x, vals[i], GREEN, 3.5));
+                Seg(a, v.d, 0, v.d, interp(v.d), AMBER, 1.5, '4 3');
+                Dot(a, v.d, interp(v.d), AMBER, 6);
+                return v.d + ' columns:  nearest / average distance = ' + interp(v.d).toFixed(2) + '  (1.00 means near and far look the same)';
+            });
+        })();
+
+        updateProgress();
+    </script>
+</body>
+</html>
